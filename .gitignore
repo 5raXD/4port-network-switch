@@ -1,0 +1,34 @@
+# VCS simulation files
+simv*
+csrc/
+*.log
+*.fsdb
+*.rc
+*.key
+verdi_config_file
+verdiLog
+*.conf
+*.vdb/
+urgReport/
+coverage_report/
+.simvision/
+*.shm/
+*.trn
+*.dsn
+
+# Waveform databases
+*.vpd
+*.wlf
+novas.rc
+verdiLog/
+
+# Build artifacts
+*.o
+*.so
+*.a
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*~
