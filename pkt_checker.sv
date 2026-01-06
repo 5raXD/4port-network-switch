@@ -31,7 +31,7 @@ class pkt_checker extends component_base;
       if (p.target[port]) begin
         p_copy = p.copy();
         expected_q[port].push_back(p_copy);
-        $display("[%0t] CHECKER: Added expected packet to port%0d queue (tag=%0d src=%b tgt=%b data=0x%h)",
+        $display("[%0t] CHECKER:added expected packet to port%0d queue (tag=%0d src=%b tgt=%b data=0x%h)",
                  $time, port, p.tag, p.source, p.target, p.data);
       end
     end
@@ -45,7 +45,7 @@ class pkt_checker extends component_base;
     
     packets_received++;
     
-    $display("[%0t] CHECKER: Checking received packet on port%0d (src=%b tgt=%b data=0x%h)",
+    $display("[%0t] CHECKER:checking received packet on port%0d (src=%b tgt=%b data=0x%h)",
              $time, port_idx, p.source, p.target, p.data);
     
     // Look for matching pkt in expected queue
@@ -63,11 +63,11 @@ class pkt_checker extends component_base;
     if (found) begin
       packets_matched++;
       expected_q[port_idx].delete(found_idx);
-      $display("[%0t] CHECKER: PASS - Packet matched on port%0d (tag=%0d)",
+      $display("[%0t] CHECKER:PASS - Packet matched on port%0d (tag=%0d)",
                $time, port_idx, expected.tag);
     end else begin
       packets_unexpected++;
-      $display("[%0t] CHECKER: FAIL - Unexpected packet on port%0d (src=%b tgt=%b data=0x%h)",
+      $display("[%0t] CHECKER:FAIL - Unexpected packet on port%0d (src=%b tgt=%b data=0x%h)",
                $time, port_idx, p.source, p.target, p.data);
     end
   endfunction
@@ -77,7 +77,7 @@ class pkt_checker extends component_base;
     automatic int total_expected_remaining = 0;
     
     $display("");
-    $display("CHECKER FINAL REPORT");
+    $display("CHECKER REPORT");
     
     // Check what we didnt receive
     for (int port = 0; port < 4; port++) begin

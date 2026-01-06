@@ -16,6 +16,6 @@ class component_base;
   endfunction
 
   function void print();
-    $display("Component: %s", pathname());
+    $display("component: %s", pathname());
   endfunction
 endclass

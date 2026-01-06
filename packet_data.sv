@@ -11,25 +11,20 @@ class packet;
   rand logic [3:0]  target;
   rand logic [7:0]  data;
   packet_type_e     pkt_type;
-  
   static int packet_count = 0;  // shared counter for unique tags
   int tag;
-
   // Source must be one-hot
   constraint valid_source {
     source inside {4'b0001, 4'b0010, 4'b0100, 4'b1000};
   }
-
   // Target cant be zero
   constraint valid_target {
     target != 4'b0000;
   }
-
   // No self loop unless broadcast
   constraint no_source_in_target {
     (target & source) == 4'b0000 || target == 4'b1111;
   }
-
   function new(string name = "packet", int port_idx = -1);
     this.name = name;
     this.tag = packet_count++;
@@ -37,7 +32,6 @@ class packet;
       this.source = 4'b0001 << port_idx;
     end
   endfunction
-
   // Returns packet type based on target bits
   function packet_type_e get_type();
     int num_targets;

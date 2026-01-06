@@ -45,7 +45,7 @@ module switch_test;
   always @(posedge clk) begin
     if (port0.valid_out) begin
       automatic packet p = new("p0_out"); p.source = port0.source_out; p.target = port0.target_out; p.data = port0.data_out;
-      $display("[%0t] omg got something on port0! src=%b tgt=%b data=%h", $time, p.source, p.target, p.data);
+      $display("[%0t]got something on port0 src=%b tgt=%b data=%h", $time, p.source, p.target, p.data);
       chk.check_received(0, p);
     end
     if (port1.valid_out) begin
@@ -55,7 +55,7 @@ module switch_test;
     end
     if (port2.valid_out) begin
       automatic packet p = new("p2_out"); p.source = port2.source_out; p.target = port2.target_out; p.data = port2.data_out;
-      $display("[%0t] port2 got it! src=%b tgt=%b data=%h", $time, p.source, p.target, p.data);
+      $display("[%0t] port2 got it src=%b tgt=%b data=%h", $time, p.source, p.target, p.data);
       chk.check_received(2, p);
     end
     if (port3.valid_out) begin
@@ -105,9 +105,9 @@ module switch_test;
 
     repeat (3) @(posedge clk);
     rst_n = 1;
-    $display("ok reset done, starting tests now...");
+    $display("reset done,start tests...");
     $display("");
-    $display("########## SWITCH TEST ##########");
+    $display("SWITCH TEST");
 
     // test 1 - single dest all combos
     $display("");
@@ -129,8 +129,8 @@ module switch_test;
 
     // test2 multicast
     $display("");
-    $display(">> test2: multicast packets");
-    $display("  sending to multiple ports at once");
+    $display(">>test2: multicast packets");
+    $display(" sending to multiple ports at once");
     send_packet(0, 4'b0001, 4'b1110, 8'hA1); repeat(12) @(posedge clk);
     send_packet(1, 4'b0010, 4'b1101, 8'hA2); repeat(12) @(posedge clk);
     send_packet(2, 4'b0100, 4'b1011, 8'hA3); repeat(12) @(posedge clk);
@@ -141,7 +141,7 @@ module switch_test;
     // test3 broadcast  
     $display("");
     $display(">> test3: broadcast (target=1111)");
-    $display("  this should go to ALL ports");
+    $display("should go to ALL ports");
     send_packet(0, 4'b0001, 4'b1111, 8'hB1); repeat(15) @(posedge clk);
     send_packet(1, 4'b0010, 4'b1111, 8'hB2); repeat(15) @(posedge clk);
     send_packet(2, 4'b0100, 4'b1111, 8'hB3); repeat(15) @(posedge clk);
@@ -151,9 +151,8 @@ module switch_test;
 
     // test4 contention
     $display("");
-    $display(">> test4: CONTENTION TEST");
-    $display("  port0 and port1 both want to send to port2!!");
-    $display("  arbiter should handle this with round robin");
+    $display(">>test4:CONTENTION TEST");
+    $display("port0 and port1 both want to send to port2");
     begin
       automatic packet p0 = new("contention_0", 0);
       automatic packet p1 = new("contention_1", 1);
@@ -168,14 +167,14 @@ module switch_test;
       @(posedge clk); sample_valid = 0;
       fork port0.drive_packet(p0); port1.drive_packet(p1); join
     end
-    $display("  waiting for arbiter...");
+    $display("waiting for arbiter...");
     repeat(15) @(posedge clk);
-    $display("  contention handled (hopefully lol)");
+    $display(" contention handled");
 
     // test5 all 4 ports at once
     $display("");
     $display(">> test5: all 4 ports sending simultaneously");
-    $display("  but no contention - each goes to different dest");
+    $display("but no contention - each goes to different dest");
     begin
       automatic packet p0 = new("conc_0", 0);
       automatic packet p1 = new("conc_1", 1);
@@ -190,7 +189,7 @@ module switch_test;
       fork port0.drive_packet(p0); port1.drive_packet(p1); port2.drive_packet(p2); port3.drive_packet(p3); join
     end
     repeat(20) @(posedge clk);
-    $display("  concurrent test done");
+    $display("concurrent test done");
 
     // test6 random 
     $display("");
@@ -211,7 +210,7 @@ module switch_test;
     // test7 edge values
     $display("");
     $display(">> test7: edge case data values");
-    $display("  trying data=0x00 (min) and data=0xFF (max)");
+    $display("trying data=0x00 (min) and data=0xFF (max)");
     send_packet(0, 4'b0001, 4'b0100, 8'h00); repeat(8) @(posedge clk);
     send_packet(1, 4'b0010, 4'b1000, 8'hFF); repeat(8) @(posedge clk);
     repeat(10) @(posedge clk);
@@ -219,7 +218,7 @@ module switch_test;
     // test8 - more contention (3 ports to same dest)
     $display("");
     $display(">> test8: 3-way contention");
-    $display("  ports 0,1,2 all trying to send to port3");
+    $display("ports 0,1,2 trying to send to port3");
     begin
       automatic packet p0 = new("cont3_0", 0);
       automatic packet p1 = new("cont3_1", 1);
@@ -231,10 +230,10 @@ module switch_test;
       fork port0.drive_packet(p0); port1.drive_packet(p1); port2.drive_packet(p2); join
     end
     repeat(25) @(posedge clk);
-    $display(" 3-way contention done");
+    $display("3-way contention done");
 
     $display("");
-    $display("##########TESTS_FINISHED##########");
+    $display("TESTS_FINISHED");
     $display("");
     chk.report();
     
