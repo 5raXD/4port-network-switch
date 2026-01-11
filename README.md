@@ -532,7 +532,6 @@ The scoreboard predicts what outputs should appear and verifies they actually do
 
 | File | Purpose |
 |------|---------|
-| `build.cud` | File list for VCS |
 | `Makefile` | Build and run commands |
 
 ---
@@ -558,25 +557,27 @@ stageA_B_optimized/
 This is faster, use for debugging:
 
 ```bash
-# Clean everything and rebuild
+# All in one
 make all
 
 # Or step by step:
 make clean       # remove old files
-make comp        # compile (vcs -f build.cud -sverilog ...)
-make run         # run simulation (./simv)
-make waveverdi   # open waveform viewer
+make comp        # compile
+make run         # run simulation
 ```
 
-What happens:
-1. VCS reads `build.cud` which lists all source files
-2. VCS compiles everything into `simv` executable
-3. `./simv` runs the simulation
-4. Waveforms are saved to `novas.fsdb`
+**Manual commands:**
+```bash
+# 1. Compile
+vcs -sverilog -full64 packet_pkg.sv port_if.sv switch_port.sv switch_4port.sv coverage_module.sv switch_test.sv
 
-### Running WITH Coverage
+# 2. Run
+qrun ./simv
+```
 
-This collects coverage data:
+### Running WITH Coverage (Required for Submission)
+
+This collects both functional coverage (required) and code coverage (optional):
 
 ```bash
 # All in one command
@@ -589,10 +590,19 @@ make run_cov     # run with coverage collection
 make view_cov    # open Verdi coverage viewer
 ```
 
-What the coverage flags do:
+**Manual commands (these always work):**
 ```bash
-vcs -cm line+cond+fsm+tgl+branch -full64
+# 1. Compile with coverage
+vcs -sverilog -cm line+cond+fsm+tgl+branch -full64 packet_pkg.sv port_if.sv switch_port.sv switch_4port.sv coverage_module.sv switch_test.sv
+
+# 2. Run with coverage
+qrun ./simv -cm line+cond+fsm+tgl+branch
+
+# 3. View coverage in Verdi
+verdi -cov -covdir simv.vdb
 ```
+
+**Coverage flags explained:**
 - `-cm line`: Line coverage (which lines executed)
 - `-cm cond`: Condition coverage (boolean expressions)
 - `-cm fsm`: FSM coverage (state machine states/transitions)
@@ -600,33 +610,11 @@ vcs -cm line+cond+fsm+tgl+branch -full64
 - `-cm branch`: Branch coverage (if/else branches)
 - `-full64`: 64-bit mode
 
-### Make Coverage Report (HTML)
+### Make HTML Coverage Report
 
 ```bash
 make report
 # Opens coverage_report/dashboard.html
-```
-
-### Manual Commands (if make doesn't work)
-
-```bash
-# Compile
-vcs -f build.cud -sverilog -kdb +vcs+fsdbon
-
-# Run
-./simv
-
-# Compile with coverage
-vcs -f build.cud -sverilog -kdb +vcs+fsdbon -cm line+cond+fsm+tgl+branch -full64
-
-# Run with coverage
-./simv -cm line+cond+fsm+tgl+branch
-
-# View coverage
-verdi -cov -covdir simv.vdb
-
-# View waveforms
-verdi -ssf novas.fsdb
 ```
 
 ---
@@ -780,29 +768,24 @@ Always think about what happens with bad inputs. Our switch drops illegal packet
 
 ## Quick Reference
 
-### Compile and run (no coverage)
+### Using Makefile
 ```bash
-make all
+make all         # compile and run (no coverage)
+make cov_all     # compile, run, and view coverage
+make view_cov    # open Verdi coverage viewer
+make report      # generate HTML coverage report
 ```
 
-### Compile and run (with coverage)
+### Manual Commands (Always Work)
 ```bash
-make cov_all
-```
+# WITHOUT coverage:
+vcs -sverilog -full64 packet_pkg.sv port_if.sv switch_port.sv switch_4port.sv coverage_module.sv switch_test.sv
+qrun ./simv
 
-### View waveforms
-```bash
-make waveverdi
-```
-
-### View coverage
-```bash
-make view_cov
-```
-
-### Generate HTML report
-```bash
-make report
+# WITH coverage:
+vcs -sverilog -cm line+cond+fsm+tgl+branch -full64 packet_pkg.sv port_if.sv switch_port.sv switch_4port.sv coverage_module.sv switch_test.sv
+qrun ./simv -cm line+cond+fsm+tgl+branch
+verdi -cov -covdir simv.vdb
 ```
 
 ---

@@ -1,0 +1,66 @@
+FOUR-PORT SWITCH PROJECT: DESIGN, VERIFICATION, AND SYNTHESIS
+
+I. PROJECT OVERVIEW
+[cite_start]This project involves developing a complete RTL design, verification environment, and synthesis flow for a simplified four-port packet switch[cite: 17]. [cite_start]The switch accepts packets on any of its four ports and forwards them to one or more destination ports based on fields encoded in each packet[cite: 18].
+
+Key Technical Specifications:
+* [cite_start]Ports: Four independent ports for data reception and transmission [cite: 32-45].
+* Packet Structure: 
+    - [cite_start]Header (Byte 0): 4-bit one-hot source address and 4-bit one-hot/mask target address[cite: 62, 63, 81].
+    - [cite_start]Payload (Byte 1): 8-bit data[cite: 65, 82].
+* Packet Types: 
+    - [cite_start]Single-Destination: One target port, cannot be the source port[cite: 91, 92].
+    - [cite_start]Multicast: 2 or 3 target ports, cannot include the source port[cite: 94, 95].
+    - [cite_start]Broadcast: Forwarded to all ports[cite: 99, 100].
+* [cite_start]Concurrency: Must handle simultaneous arrivals on multiple inputs without drops or corruption using Round-Robin arbitration[cite: 26, 27].
+
+---
+
+II. STAGE A: DESIGN (RTL IMPLEMENTATION)
+[cite_start]Objective: Implement the hardware logic using Verilog/SystemVerilog[cite: 20].
+
+Key Steps:
+* [cite_start]FSM Control: Manage packet flow through states such as idle, receive, route, and transmit[cite: 148].
+* [cite_start]Modular Design: Divide the switch into an input parser, router, and output mux per port[cite: 150].
+* [cite_start]Coding Standards: Use parametric coding (e.g., NUM_PORTS=4), DEFINE macros, and at least two types of loops[cite: 129, 133, 151].
+* [cite_start]Clock/Reset: Implement edge-sensitive clocking and synchronous resets[cite: 148].
+* [cite_start]QA Testing: Run simple simulations to verify basic forwarding and compilation[cite: 152].
+* [cite_start]Deliverables: RTL files, block diagrams, state diagrams, and simulation logs [cite: 153-157].
+
+---
+
+III. STAGE B: VERIFICATION COMPONENT ARCHITECTURE
+[cite_start]Objective: Build a modular, OOP-based verification environment with constrained-random stimulus[cite: 21, 161].
+
+Key Steps:
+* [cite_start]Class Hierarchy: Create a base component class for naming and hierarchy management [cite: 163-167].
+* Verification Components:
+    - [cite_start]Sequencer: Produces and randomizes appropriately-typed packet objects [cite: 168-171].
+    - [cite_start]Driver: Transmits packets to the DUT via virtual interfaces [cite: 172-177].
+    - [cite_start]Monitor: Samples received packets from the DUT outputs [cite: 178-181].
+    - [cite_start]Agent & VC: Encapsulate the components for each port [cite: 182-189].
+* [cite_start]Checkers: Compare expected packets (from sequencer) with actual outputs (from monitor) to validate routing [cite: 191-196].
+* [cite_start]Coverage: Implement functional coverage for packet types, FSM states, and source/target combinations[cite: 206].
+* [cite_start]Deliverables: Completed class files, simulation transcripts, and functional coverage reports [cite: 240-243].
+
+---
+
+IV. STAGE C: SYNTHESIS (HEAVILY EMPHASIZED)
+[cite_start]Objective: Perform logic synthesis and analyze physical performance metrics[cite: 22, 245]. [cite_start]This stage accounts for 60% of the total grade[cite: 280].
+
+Key Steps:
+* [cite_start]Logic Synthesis: Use tools like Synopsys Design Compiler to convert RTL into a gate-level netlist[cite: 246].
+* [cite_start]Gate-Level Verification: Perform simulations on the netlist to ensure functionality remains correct[cite: 247].
+* [cite_start]Clock Gating Analysis: Conduct synthesis runs with and without clock gating enabled to compare results[cite: 248].
+* Performance Metrics:
+    - [cite_start]Slack Analysis: Determine the maximum operating frequency[cite: 250].
+    - [cite_start]Area/Power: Calculate the physical footprint and power consumption[cite: 252].
+    - [cite_start]Resource Utilization: Analyze usage of logic elements, memory, and interconnects[cite: 253].
+* [cite_start]Deliverables: Synthesis scripts, gate-level netlist, and detailed analysis tables/graphs [cite: 256-259].
+
+---
+
+V. GRADING CRITERIA SUMMARY
+* [cite_start]Stage A (20%): FSM correctness, modularity, and basic QA [cite: 282-285].
+* [cite_start]Stage B (20%): Component architecture, packet randomization, checkers, and coverage [cite: 286-293].
+* [cite_start]Stage C (60%): Synthesis execution, gate-level verification, clock gating comparison, and detailed performance analysis (area/power/frequency/runtime) [cite: 294-298].

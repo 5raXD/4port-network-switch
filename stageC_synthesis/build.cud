@@ -1,0 +1,9 @@
+# File list for 4-Port Switch
+# packet_pkg.sv includes: packet_data, component_base, sequencer, driver, monitor, agent, packet_vc, pkt_checker
+
+packet_pkg.sv
+port_if.sv
+switch_port.sv
+switch_4port.sv
+coverage_module.sv
+switch_test.sv

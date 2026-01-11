@@ -4,35 +4,38 @@
 # Coverage flags for VCS
 CM = line+cond+fsm+tgl+branch
 
-all:	clean comp run waveverdi
+# Source files
+SRC = packet_pkg.sv port_if.sv switch_port.sv switch_4port.sv coverage_module.sv switch_test.sv
 
-test:   comp run
+all: clean comp run
+
+test: comp run
 
 # Regular simulation (no coverage)
 clean:
 	\rm -rf simv* csrc* *.log *.fsdb *.rc *.key verdi_config_file verdiLog *.conf *.vdb urgReport coverage_report
 
 comp:
-	vcs -f build.cud -sverilog -kdb +vcs+fsdbon
+	vcs -sverilog -full64 $(SRC)
 
 run:
-	qrsh -V -cwd -b y -q normal ./simv 2>&1 | tee log
+	qrun ./simv 2>&1 | tee log
 
 waveverdi: 	
 	verdi -ssf novas.fsdb
 
-# Coverage simulation - run these for Verdi coverage view
+# Coverage simulation
 
 # All in one: clean -> compile -> run -> view
 cov_all: clean comp_cov run_cov view_cov
 
-# Compile with coverage flags (same build.cud, coverage_module is included)
+# Compile with coverage flags
 comp_cov:
-	vcs -f build.cud -sverilog -kdb +vcs+fsdbon -cm $(CM) -full64
+	vcs -sverilog -cm $(CM) -full64 $(SRC)
 
-# Run sim with coverage on
+# Run sim with coverage
 run_cov:
-	qrsh -V -cwd -b y -q normal ./simv -cm $(CM) 2>&1 | tee log_cov
+	qrun ./simv -cm $(CM) 2>&1 | tee log_cov
 	@echo "Coverage database: simv.vdb"
 
 # Open verdi to see coverage

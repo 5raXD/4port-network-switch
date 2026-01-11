@@ -1,0 +1,1 @@
+"switch_test" -debug "typical" -s "switch_test_sim" 
