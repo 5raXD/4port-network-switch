@@ -1,7 +1,3 @@
-// Synthesizable top-level wrapper for 4-port network switch
-// This module wraps switch_4port with flattened ports (no interface) for synthesis
-// The interface construct is not synthesizable by Fusion Compiler
-
 module switch_4port_synth #(
   parameter NUM_PORTS = 4,
   parameter FIFO_DEPTH = 16

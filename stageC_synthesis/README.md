@@ -1,142 +1,878 @@
-# Stage C: Synthesis - 4-Port Network Switch
-
-## What is Synthesis and How it Differs from Stages A & B
-
-| Stage | Purpose | Tool | Input | Output |
-|-------|---------|------|-------|--------|
-| **A (RTL)** | Write hardware behavior | Editor | Specs | .sv files |
-| **B (Verification)** | Test RTL correctness | VCS | RTL + TB | Sim logs, coverage |
-| **C (Synthesis)** | Convert to physical gates | Fusion Compiler | RTL + SDC | Gate netlist, reports |
-
-**Key Difference**: Stages A & B use *behavioral* code (what it does). Stage C produces *structural* code (how to build it with real gates).
+# 4-Port Network Switch - Complete Project Guide
+## Stages A, B, and C: RTL Design, Verification, and Synthesis
 
 ---
 
-## Directory Contents
-
-### Original Stage B Files (RTL + Verification)
-- `switch_4port.sv` - Top module with interface (for RTL sim)
-- `switch_port.sv` - Port module (for RTL sim)  
-- `packet_pkg.sv` - Package with classes + functions
-- `port_if.sv` - Interface definition
-- `switch_test.sv` - Testbench
-- `*_checker.sv, agent.sv, driver.sv, etc.` - Verification components
-- `build.cud` - File list for VCS
-
-### New Stage C Files (Synthesis)
-- `switch_4port_synth.sv` - **Synthesizable** top (flattened ports, no interface)
-- `switch_port_synth.sv` - **Synthesizable** port (no $display, no classes)
-- `switch.sdc` - Timing constraints (100MHz clock)
-- `run_synthesis.tcl` - Synthesis script (no clock gating)
-- `run_synthesis_clkgate.tcl` - Synthesis script (with clock gating)
-- `switch_test_gate.sv` - Gate-level testbench
+# Table of Contents
+1. [Project Overview](#project-overview)
+2. [File Reference Table](#file-reference-table)
+3. [Stage A: RTL Design](#stage-a-rtl-design)
+4. [Stage B: Verification](#stage-b-verification)
+5. [Stage C: Synthesis](#stage-c-synthesis)
+6. [SystemVerilog Concepts Explained](#systemverilog-concepts-explained)
+7. [Running the Project](#running-the-project)
 
 ---
 
-## How to Run
+# Project Overview
 
-### 1. RTL Simulation (Stage B - verify code still works)
+This project implements a **4-port network switch** that routes packets between ports based on target addresses. The switch supports:
+- **Unicast**: Send to one destination port
+- **Multicast**: Send to multiple destination ports
+- **Broadcast**: Send to all ports (target = 4'b1111)
+- **Contention handling**: Round-robin arbitration when multiple sources target the same destination
 
-**From DVT Eclipse** (VCS is set up there):
-- Import this project folder into DVT
-- Use the build.cud file list
-- Run simulation like Stage B
+## Project Stages
 
-**From terminal (if VCS is in PATH)**:
-```bash
-cd /home/ma5/Desktop/uni/Design,\ Verification/proj_sunth_vlsi/stageA_B_new/stageC_synthesis
-make test
+| Stage | Purpose | Input | Output | Tool |
+|-------|---------|-------|--------|------|
+| **A - RTL Design** | Write hardware behavior | Specifications | `.sv` files | Text Editor |
+| **B - Verification** | Test RTL correctness | RTL + Testbench | Pass/Fail + Coverage | VCS/Vivado |
+| **C - Synthesis** | Convert to real gates | RTL + Constraints | Gate Netlist | Fusion Compiler |
+
+```
+Stage A          Stage B              Stage C
+┌─────────┐     ┌──────────────┐     ┌────────────────┐
+│  Write  │     │   Run Tests  │     │   Synthesize   │
+│   RTL   │────►│   (VCS/      │────►│   (Fusion      │────► Gate Netlist
+│  Code   │     │   Vivado)    │     │   Compiler)    │      (.v file)
+└─────────┘     └──────────────┘     └────────────────┘
+     │                 │                     │
+     ▼                 ▼                     ▼
+ switch_port.sv   PASS/FAIL          switch_4port_netlist.v
+ switch_4port.sv  Coverage           timing_report.txt
+                  Reports             area_report.txt
 ```
 
-### 2. Lint Check (Verilator - synthesizable code only)
-```bash
-verilator --lint-only -Wno-UNUSEDPARAM -Wno-UNUSEDSIGNAL switch_port_synth.sv switch_4port_synth.sv
-```
-✓ Passing means synthesizable RTL has no syntax errors
+---
 
-### 3. Synthesis (NO clock gating)
+# File Reference Table
+
+## Which Files to Use for Lab Computers
+
+### For RTL Simulation (Stage A/B) - Use VCS
+| File | Purpose | Required |
+|------|---------|----------|
+| `packet_pkg.sv` | Package with parameters, functions, verification classes | ✅ Yes |
+| `port_if.sv` | SystemVerilog interface for port connections | ✅ Yes |
+| `switch_port.sv` | Single port module (FIFO + FSM) | ✅ Yes |
+| `switch_4port.sv` | Top module with 4 ports + arbiter | ✅ Yes |
+| `coverage_module.sv` | Functional coverage collection | ✅ Yes |
+| `switch_test.sv` | Main testbench with all tests | ✅ Yes |
+| `build.cud` | File list for VCS | ✅ Yes |
+| `Makefile` | Build automation | ✅ Yes |
+
+### For Synthesis (Stage C) - Use Fusion Compiler
+| File | Purpose | Required |
+|------|---------|----------|
+| `switch_port_synth.sv` | Synthesizable port (no $display, no classes) | ✅ Yes |
+| `switch_4port_synth.sv` | Synthesizable top (flattened ports) | ✅ Yes |
+| `switch.sdc` | Timing constraints (clock, delays) | ✅ Yes |
+| `run_synthesis.tcl` | Synthesis script (no clock gating) | ✅ Yes |
+| `run_synthesis_clkgate.tcl` | Synthesis script (with clock gating) | ✅ Yes |
+
+### For Gate-Level Simulation (After Synthesis)
+| File | Purpose | Required |
+|------|---------|----------|
+| `switch_test_gate.sv` | Gate-level testbench | ✅ Yes |
+| `switch_4port_netlist.v` | Generated by synthesis | Generated |
+
+### Verification Components (included via packet_pkg.sv)
+| File | Purpose | Stage |
+|------|---------|-------|
+| `packet_data.sv` | Packet class with randomization | B |
+| `component_base.sv` | Base class for verification components | B |
+| `sequencer.sv` | Generates packet sequences | B |
+| `driver.sv` | Drives packets to DUT | B |
+| `monitor.sv` | Observes DUT outputs | B |
+| `agent.sv` | Groups driver + monitor | B |
+| `packet_vc.sv` | Verification component wrapper | B |
+| `pkt_checker.sv` | Scoreboard for checking packets | B |
+
+---
+
+# Stage A: RTL Design
+
+## What is RTL?
+**RTL (Register Transfer Level)** describes hardware behavior at the register level - what happens on each clock cycle. It's the "source code" of hardware.
+
+## The Design Architecture
+
+```
+                    ┌─────────────────────────────────────────────┐
+                    │              switch_4port                    │
+                    │                                             │
+    Port0 ◄────────►│  ┌──────────┐         ┌───────────┐        │◄────────► Port0
+    Input           │  │switch_   │         │           │        │           Output
+                    │  │port[0]   │◄───────►│           │        │
+                    │  └──────────┘         │           │        │
+    Port1 ◄────────►│  ┌──────────┐         │  ARBITER  │        │◄────────► Port1
+    Input           │  │switch_   │◄───────►│  (Round   │        │           Output
+                    │  │port[1]   │         │   Robin)  │        │
+                    │  └──────────┘         │           │        │
+    Port2 ◄────────►│  ┌──────────┐         │           │        │◄────────► Port2
+    Input           │  │switch_   │◄───────►│           │        │           Output
+                    │  │port[2]   │         │           │        │
+                    │  └──────────┘         └───────────┘        │
+    Port3 ◄────────►│  ┌──────────┐                              │◄────────► Port3
+    Input           │  │switch_   │                              │           Output
+                    │  │port[3]   │                              │
+                    │  └──────────┘                              │
+                    └─────────────────────────────────────────────┘
+```
+
+## Packet Format
+
+Each packet is 16 bits:
+```
+┌─────────────┬─────────────┬─────────────────────┐
+│ source[3:0] │ target[3:0] │     data[7:0]       │
+│   4 bits    │   4 bits    │      8 bits         │
+└─────────────┴─────────────┴─────────────────────┘
+     15:12        11:8            7:0
+
+Source/Target encoding (one-hot):
+  Port 0 = 4'b0001
+  Port 1 = 4'b0010
+  Port 2 = 4'b0100
+  Port 3 = 4'b1000
+  Broadcast = 4'b1111
+```
+
+## Key RTL Components
+
+### 1. switch_port.sv - Individual Port Module
+
+Each port has two main functions:
+- **Ingress**: Receive packets from external input, store in FIFO
+- **Egress**: Output packets from arbiter to external output
+
+```
+                    ┌─────────────────────────────────────┐
+                    │           switch_port               │
+    valid_in ──────►│  ┌─────────┐     ┌──────────────┐  │
+    source_in ─────►│  │ INGRESS │     │              │  │
+    target_in ─────►│  │   FSM   │────►│    FIFO      │  │
+    data_in ───────►│  │(receive)│     │  (16 deep)   │  │
+                    │  └─────────┘     └──────┬───────┘  │
+                    │                         │          │
+                    │                         ▼          │
+                    │               request + target ────┼──► To Arbiter
+                    │                         │          │
+                    │               grant ◄──────────────┼─── From Arbiter
+                    │                         │          │
+                    │                         ▼          │
+                    │  ┌─────────┐     internal_data ◄───┼─── From Arbiter
+                    │  │ EGRESS  │◄───────────┘          │
+    valid_out ◄────┼──│   FSM   │                       │
+    source_out ◄───┼──│(output) │                       │
+    target_out ◄───┼──│         │                       │
+    data_out ◄─────┼──└─────────┘                       │
+                    └─────────────────────────────────────┘
+```
+
+**Ingress FSM States:**
+```systemverilog
+typedef enum logic {S_IDLE, S_RECEIVE} ingress_state_e;
+
+// S_IDLE:    Waiting for valid packet
+// S_RECEIVE: Capture packet, write to FIFO
+```
+
+**Egress FSM States:**
+```systemverilog
+typedef enum logic {E_IDLE, E_OUTPUT} egress_state_e;
+
+// E_IDLE:   Waiting for arbiter grant
+// E_OUTPUT: Output packet on port
+```
+
+### 2. switch_4port.sv - Top Module with Arbiter
+
+The arbiter handles contention when multiple ports want to send to the same destination.
+
+**Arbiter FSM:**
+```systemverilog
+typedef enum logic [1:0] {ARB_IDLE, ARB_GRANT, ARB_COMPLETE} arb_state_e;
+
+// ARB_IDLE:     Check for requests
+// ARB_GRANT:    Grant winners, route packets
+// ARB_COMPLETE: Clear grants, return to idle
+```
+
+**Round-Robin Priority:**
+When multiple sources target the same output port, the arbiter uses round-robin to ensure fairness:
+
+```
+Example: Port0 and Port2 both want to send to Port1
+
+Cycle 1: rr_priority[1] = 0
+  - Check port 1, 2, 3, 0 (starting after 0)
+  - Port2 wins (first candidate after priority)
+  - rr_priority[1] = 2
+
+Cycle 2: rr_priority[1] = 2
+  - Check port 3, 0, 1, 2 (starting after 2)
+  - Port0 wins (next in round-robin)
+  - rr_priority[1] = 0
+```
+
+### 3. Illegal Packet Detection
+
+The switch drops invalid packets:
+```systemverilog
+function automatic logic is_illegal_packet(input logic [3:0] src, input logic [3:0] tgt);
+  return is_self_loop(src, tgt) ||    // Can't send to yourself
+         is_no_target(tgt) ||          // Target can't be 0000
+         is_invalid_source(src);       // Source must be one-hot
+endfunction
+```
+
+---
+
+# Stage B: Verification
+
+## What is Verification?
+Verification proves that your RTL behaves correctly. We use a **testbench** to:
+1. Generate test inputs (stimulus)
+2. Apply them to the DUT (Device Under Test)
+3. Check outputs match expected behavior
+4. Collect coverage metrics
+
+## Verification Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        switch_test (Testbench)                  │
+│                                                                 │
+│  ┌───────────────┐                      ┌───────────────────┐  │
+│  │    packet     │                      │    pkt_checker    │  │
+│  │   sequencer   │                      │   (scoreboard)    │  │
+│  │               │                      │                   │  │
+│  │ Generates     │                      │ Tracks expected   │  │
+│  │ random pkts   │                      │ vs received       │  │
+│  └───────┬───────┘                      └────────▲──────────┘  │
+│          │                                       │              │
+│          ▼                                       │              │
+│  ┌───────────────┐                               │              │
+│  │    driver     │                               │              │
+│  │               │     ┌─────────────┐           │              │
+│  │ Converts to   │────►│   port_if   │───────────┤              │
+│  │ pin wiggles   │     │ (interface) │           │              │
+│  └───────────────┘     └──────┬──────┘           │              │
+│                               │                  │              │
+│                               ▼                  │              │
+│                      ┌───────────────┐           │              │
+│                      │  switch_4port │           │              │
+│                      │    (DUT)      │           │              │
+│                      └───────┬───────┘           │              │
+│                               │                  │              │
+│                               ▼                  │              │
+│  ┌───────────────┐     ┌──────────────┐          │              │
+│  │   monitor     │◄────│   port_if    │──────────┘              │
+│  │               │     │  (interface) │                         │
+│  │ Observes      │     └──────────────┘                         │
+│  │ outputs       │                                              │
+│  └───────────────┘                                              │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐ │
+│  │                  coverage_module                           │ │
+│  │  Tracks: packet types, data values, FSM states, etc.      │ │
+│  └───────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Verification Components Explained
+
+### 1. packet_data.sv - Packet Class
+```systemverilog
+class packet;
+  rand logic [3:0]  source;    // Random source port
+  rand logic [3:0]  target;    // Random target port(s)
+  rand logic [7:0]  data;      // Random data
+  static int pkt_count;        // Track packet IDs
+  int tag;                     // Unique packet identifier
+
+  // Constraints ensure valid packets
+  constraint c_source {
+    source inside {4'b0001, 4'b0010, 4'b0100, 4'b1000};  // One-hot only
+  }
+  
+  constraint c_target {
+    target != 4'b0000;  // Must have at least one target
+  }
+endclass
+```
+
+**Why use `rand`?** Random values find bugs you didn't think to test manually.
+
+### 2. driver.sv - Stimulus Driver
+```systemverilog
+class driver extends component_base;
+  mailbox #(packet) mbx_in;   // Receives packets from sequencer
+  virtual port_if vif;         // Connection to DUT
+  
+  task run();
+    forever begin
+      packet p;
+      mbx_in.get(p);           // Get packet from mailbox
+      vif.drive_packet(p);     // Drive to DUT via interface
+    end
+  endtask
+endclass
+```
+
+### 3. monitor.sv - Output Observer
+```systemverilog
+class monitor extends component_base;
+  mailbox #(packet) mbx_out;   // Sends packets to checker
+  virtual port_if vif;
+  
+  task run();
+    forever begin
+      packet p;
+      vif.collect_packet(p);   // Wait for output, capture it
+      mbx_out.put(p);          // Send to checker
+    end
+  endtask
+endclass
+```
+
+### 4. pkt_checker.sv - Scoreboard
+```systemverilog
+class pkt_checker;
+  packet expected_queue[$];    // Queue of expected packets
+  int packets_matched;
+  int packets_lost;
+  
+  function void add_expected(packet p);
+    expected_queue.push_back(p);
+  endfunction
+  
+  function void check_received(packet p);
+    // Search for matching packet in expected queue
+    // If found: PASS, increment matched count
+    // If not found: FAIL, unexpected packet
+  endfunction
+endclass
+```
+
+## Test Cases in switch_test.sv
+
+| Test | Description | What it Verifies |
+|------|-------------|------------------|
+| test1 | Single destination (all src→dst combos) | Basic routing works |
+| test2 | Multicast (one src → multiple dst) | Multicast replication |
+| test3 | Broadcast (target = 1111) | Broadcast to all ports |
+| test4 | 2-way contention | Arbiter handles conflicts |
+| test5 | 4 simultaneous packets (no conflict) | Parallel routing |
+| test6 | 16 random packets | General functionality |
+| test7 | Edge case data (0x00, 0xFF) | Data integrity |
+| test8 | 3-way contention | Round-robin fairness |
+
+## Coverage Metrics
+
+```systemverilog
+// coverage_module.sv tracks:
+
+covergroup packet_coverage;
+  // Did we test all packet types?
+  packet_type: coverpoint pkt_type {
+    bins single = {SINGLE};
+    bins multicast = {MULTICAST};
+    bins broadcast = {BROADCAST};
+  }
+  
+  // Did we test all data values?
+  data_values: coverpoint data {
+    bins zero = {8'h00};
+    bins max = {8'hFF};
+    bins others = {[8'h01:8'hFE]};
+  }
+  
+  // Did we test contention?
+  contention: coverpoint simultaneous_requests {
+    bins no_contention = {0, 1};
+    bins two_way = {2};
+    bins three_way = {3};
+    bins four_way = {4};
+  }
+endgroup
+```
+
+---
+
+# Stage C: Synthesis
+
+## What is Synthesis?
+Synthesis converts RTL (behavioral code) into a **gate-level netlist** (structural code) using real logic gates from a technology library.
+
+```
+RTL Code                    Gate Netlist
+───────────────────────    ───────────────────────
+always_ff @(posedge clk)    DFFX1 reg_q (
+  if (!rst_n)                 .D(d_input),
+    q <= 0;          ──►      .CLK(clk),
+  else                        .RSTB(rst_n),
+    q <= d;                   .Q(q)
+                            );
+```
+
+## Why Synthesizable Code is Different
+
+The synthesis tool can only understand hardware constructs. It cannot synthesize:
+
+| ❌ NOT Synthesizable | Why | ✅ Synthesizable Alternative |
+|---------------------|-----|------------------------------|
+| `$display("msg")` | Just for debug | Remove or use ifdef |
+| `class packet` | Software concept | Use struct or signals |
+| `interface` with tasks | Tasks are behavioral | Flatten to ports |
+| `initial begin` | No hardware equivalent | Use reset logic |
+| `#10 delay` | No hardware meaning | Remove |
+| `fork/join` | Parallel threads | Use parallel hardware |
+
+## Files for Synthesis
+
+### switch_port_synth.sv vs switch_port.sv
+
+**Original (switch_port.sv):**
+```systemverilog
+import packet_pkg::*;  // Imports class definitions
+
+// Uses $display for debug
+$display("[%0t] WARNING: dropping illegal packet", $time);
+```
+
+**Synthesizable (switch_port_synth.sv):**
+```systemverilog
+// No import - functions copied locally
+// No $display - removed entirely
+
+// Functions defined locally instead of imported
+function automatic logic is_illegal_packet(...);
+  ...
+endfunction
+```
+
+### switch_4port_synth.sv vs switch_4port.sv
+
+**Original (switch_4port.sv):**
+```systemverilog
+module switch_4port (
+  input logic clk, rst_n,
+  port_if port0,  // Uses interface
+  port_if port1,
+  port_if port2,
+  port_if port3
+);
+```
+
+**Synthesizable (switch_4port_synth.sv):**
+```systemverilog
+module switch_4port_synth (
+  input  logic        clk,
+  input  logic        rst_n,
+  // Port 0 - flattened (no interface)
+  input  logic        port0_valid_in,
+  input  logic [3:0]  port0_source_in,
+  input  logic [3:0]  port0_target_in,
+  input  logic [7:0]  port0_data_in,
+  output logic        port0_valid_out,
+  output logic [3:0]  port0_source_out,
+  output logic [3:0]  port0_target_out,
+  output logic [7:0]  port0_data_out,
+  // Port 1, 2, 3 similarly...
+);
+```
+
+## Timing Constraints (switch.sdc)
+
+The SDC file tells the synthesis tool your timing requirements:
+
+```tcl
+# Define clock: 100 MHz (10ns period)
+create_clock -period 10 -name clk [get_ports clk]
+
+# Clock uncertainty (jitter + skew)
+set_clock_uncertainty -setup 0.15 [get_clocks clk]
+set_clock_uncertainty -hold 0.10 [get_clocks clk]
+
+# Input delay: signals arrive 0.5ns after clock
+set_input_delay -clock clk -max 0.5 [all_inputs]
+
+# Output delay: signals must be ready 0.5ns before clock
+set_output_delay -clock clk -max 0.5 [all_outputs]
+```
+
+**Timing Diagram:**
+```
+        Clock Period = 10ns
+    ◄─────────────────────────►
+    
+    │ Input │ Combinational │ Setup│
+    │ Delay │    Logic      │      │
+    │ 0.5ns │   ≤ 9.35ns    │0.15ns│
+    ◄──────►◄──────────────►◄─────►
+    
+    Logic must complete in: 10 - 0.5 - 0.5 - 0.15 = 8.85ns
+```
+
+## Synthesis Scripts
+
+### run_synthesis.tcl - Basic Synthesis
+```tcl
+# 1. Setup technology library (SAED 32nm)
+create_lib -technology $TECH_FILE -ref_libs {
+    saed32_hvt.ndm   # High-Vt cells (slow, low power)
+    saed32_rvt.ndm   # Regular-Vt cells (balanced)
+    saed32_lvt.ndm   # Low-Vt cells (fast, high power)
+}
+
+# 2. Read synthesizable RTL
+analyze -format sverilog {switch_port_synth.sv switch_4port_synth.sv}
+
+# 3. Elaborate design
+elaborate switch_4port_synth
+
+# 4. Apply timing constraints
+source switch.sdc
+
+# 5. Compile (synthesize!)
+compile_fusion
+
+# 6. Generate reports
+report_timing > timing_report.txt
+report_area > area_report.txt
+report_power > power_report.txt
+
+# 7. Write netlist
+write_verilog switch_4port_netlist.v
+```
+
+### run_synthesis_clkgate.tcl - With Clock Gating
+Clock gating saves power by stopping the clock to unused flip-flops:
+
+```tcl
+# Enable clock gating optimization
+compile_fusion -gate_clock
+```
+
+**Without clock gating:**
+```
+    CLK ───────────────────────► FF (always toggles)
+```
+
+**With clock gating:**
+```
+              ┌────────┐
+    EN ──────►│  CG    │
+              │ Cell   ├───► FF (only toggles when EN=1)
+    CLK ─────►│        │
+              └────────┘
+```
+
+## Understanding Synthesis Reports
+
+### Timing Report
+```
+Timing Path: port0_data_in → port2_data_out
+
+Point                     Delay      Path
+───────────────────────────────────────────
+clock clk (rise)           0.00      0.00
+port0_data_in              0.50      0.50   (input delay)
+U123/Y (AND2X1)            0.08      0.58
+U456/Y (OR2X1)             0.06      0.64
+...
+fifo_mem_reg/D             0.00      8.45
+───────────────────────────────────────────
+data arrival time                    8.45
+
+clock clk (rise)          10.00
+clock uncertainty         -0.15
+FF setup time             -0.08
+───────────────────────────────────────────
+data required time                   9.77
+
+slack (MET)                          1.32   ← Positive = PASS!
+```
+
+**Slack** = (Required time) - (Arrival time)
+- Positive slack → Timing passes ✅
+- Negative slack → Timing violation ❌ (need to fix)
+
+### Area Report
+```
+Module                  Cells    Area (μm²)
+─────────────────────────────────────────────
+switch_4port_synth
+├── gen_ports[0]          234      1,245.6
+├── gen_ports[1]          234      1,245.6
+├── gen_ports[2]          234      1,245.6
+├── gen_ports[3]          234      1,245.6
+└── arbiter               156        823.4
+─────────────────────────────────────────────
+TOTAL                   1,092      5,805.8 μm²
+```
+
+### Power Report
+```
+Power Group         Dynamic    Leakage    Total
+──────────────────────────────────────────────
+Clock network         2.1mW     0.01mW    2.11mW
+Registers             1.5mW     0.02mW    1.52mW
+Combinational         0.8mW     0.03mW    0.83mW
+──────────────────────────────────────────────
+TOTAL                 4.4mW     0.06mW    4.46mW
+```
+
+---
+
+# SystemVerilog Concepts Explained
+
+## 1. Modules
+The basic building block of hardware:
+```systemverilog
+module my_module (
+  input  logic clk,        // Input port
+  input  logic [7:0] din,  // 8-bit input
+  output logic [7:0] dout  // 8-bit output
+);
+  // Hardware description here
+endmodule
+```
+
+## 2. always_ff vs always_comb
+
+**always_ff** - Sequential logic (registers/flip-flops):
+```systemverilog
+always_ff @(posedge clk or negedge rst_n)
+  if (!rst_n)
+    q <= 0;        // Reset value
+  else
+    q <= d;        // Capture d on clock edge
+```
+
+**always_comb** - Combinational logic (no memory):
+```systemverilog
+always_comb begin
+  y = a & b;       // AND gate
+  z = x ? a : b;   // Multiplexer
+end
+```
+
+## 3. Blocking (=) vs Non-blocking (<=)
+
+**Non-blocking (<=)** - Use in always_ff:
+```systemverilog
+always_ff @(posedge clk) begin
+  a <= b;    // All assignments happen "simultaneously"
+  b <= a;    // Swaps a and b correctly
+end
+```
+
+**Blocking (=)** - Use in always_comb:
+```systemverilog
+always_comb begin
+  temp = a + b;    // Sequential evaluation
+  y = temp * 2;    // Uses result of previous line
+end
+```
+
+## 4. Finite State Machines (FSM)
+
+```systemverilog
+typedef enum logic [1:0] {IDLE, RUN, DONE} state_e;
+state_e state, next_state;
+
+// State register
+always_ff @(posedge clk or negedge rst_n)
+  if (!rst_n) state <= IDLE;
+  else state <= next_state;
+
+// Next state logic
+always_comb begin
+  next_state = state;  // Default: stay in current state
+  case (state)
+    IDLE: if (start) next_state = RUN;
+    RUN:  if (done)  next_state = DONE;
+    DONE:            next_state = IDLE;
+  endcase
+end
+
+// Output logic
+always_comb begin
+  busy = (state == RUN);
+  finished = (state == DONE);
+end
+```
+
+## 5. Interfaces
+Group related signals together:
+```systemverilog
+interface port_if (input bit clk);
+  logic valid;
+  logic [7:0] data;
+  
+  modport master (output valid, data);
+  modport slave (input valid, data);
+endinterface
+```
+
+## 6. Classes (Verification Only)
+```systemverilog
+class packet;
+  rand logic [7:0] data;    // Random variable
+  
+  constraint c_data {
+    data inside {[0:100]};  // Constrain range
+  }
+  
+  function void display();
+    $display("data = %h", data);
+  endfunction
+endclass
+
+// Usage:
+packet p = new();
+p.randomize();  // Generate random values
+p.display();
+```
+
+## 7. Mailboxes
+Communication between verification components:
+```systemverilog
+mailbox #(packet) mbx = new();
+
+// Producer
+packet p = new();
+mbx.put(p);  // Send packet
+
+// Consumer
+packet received;
+mbx.get(received);  // Receive packet (blocks until available)
+```
+
+## 8. Generate Blocks
+Create multiple instances:
+```systemverilog
+genvar i;
+generate
+  for (i = 0; i < 4; i++) begin : gen_ports
+    switch_port #(.PORT_ID(i)) port_inst (
+      .clk(clk),
+      .rst_n(rst_n),
+      ...
+    );
+  end
+endgenerate
+```
+
+## 9. Parameters
+Configurable constants:
+```systemverilog
+module fifo #(
+  parameter DEPTH = 16,      // Default value
+  parameter WIDTH = 8
+)(
+  input logic [WIDTH-1:0] din,
+  ...
+);
+
+// Instantiation with different parameters:
+fifo #(.DEPTH(32), .WIDTH(16)) big_fifo (...);
+```
+
+## 10. Assertions (Verification)
+```systemverilog
+// Immediate assertion
+assert (count <= MAX_COUNT) else $error("Counter overflow!");
+
+// Concurrent assertion
+assert property (@(posedge clk) req |-> ##[1:3] ack)
+  else $error("No ack within 3 cycles of req");
+```
+
+---
+
+# Running the Project
+
+## On Lab Computers (VCS + Fusion Compiler)
+
+### RTL Simulation (Stage B)
 ```bash
+cd stageC_synthesis
+
+# Clean previous runs
+make clean
+
+# Compile and run with VCS
+make vcs-sim
+
+# View waveforms
+make waveverdi
+```
+
+### Synthesis (Stage C)
+```bash
+# Start Fusion Compiler
 fc_shell
-source run_synthesis.tcl
-```
-**Output**: `switch_4port_netlist.v`, `*_report.txt`
 
-### 3. Synthesis (WITH clock gating)
+# Run synthesis (choose one):
+source run_synthesis.tcl           # Without clock gating
+source run_synthesis_clkgate.tcl   # With clock gating
+
+# Exit
+exit
+```
+
+### Gate-Level Simulation
 ```bash
-fc_shell
-source run_synthesis_clkgate.tcl
+# After synthesis generates switch_4port_netlist.v:
+vcs -sverilog switch_test_gate.sv switch_4port_netlist.v \
+    -v /path/to/saed32_rvt.v +define+GATE_SIM
+./simv
 ```
-**Output**: `switch_4port_netlist_clkgate.v`, `*_report_clkgate.txt`, `clock_gating_report.txt`
 
-### 4. Gate-Level Simulation
+## On Personal Computer (Vivado)
+
+### RTL Simulation
 ```bash
-make gate_sim           # Without clock gating
-make gate_sim_clkgate   # With clock gating
+cd stageC_synthesis
+
+# Clean and run
+make clean
+make sim
 ```
 
 ---
 
-## Gate-Level Verification (What the Instructor Asked)
+# Quick Reference
 
-**Q**: What is gate-level simulation?
-**A**: Run the Stage B verification on the netlist from synthesis to ensure:
-1. Synthesis didn't introduce bugs
-2. Behavior matches RTL exactly
-3. All packets still route correctly
+## Compile Order (build.cud)
+```
+packet_pkg.sv      # 1. Package first (defines types, classes)
+port_if.sv         # 2. Interface (used by modules)
+switch_port.sv     # 3. Sub-module
+switch_4port.sv    # 4. Top module (instantiates sub-modules)
+coverage_module.sv # 5. Coverage
+switch_test.sv     # 6. Testbench (instantiates DUT)
+```
 
-The `switch_test_gate.sv` runs the same tests as Stage B but on the synthesized netlist.
+## Common Issues
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| "Module not found" | Wrong compile order | Check build.cud order |
+| Timing violation | Logic too slow | Optimize RTL or relax constraints |
+| "Not synthesizable" | Used $display/class | Use *_synth.sv files |
+| Simulation hangs | Missing stimulus | Check driver/sequencer |
+| Packets lost | Checker mismatch | Debug with waveforms |
 
 ---
 
-## Clock Gating Comparison
+## Authors
+Stage A/B/C implementation for VLSI Design and Verification course.
 
-Clock gating stops the clock to unused registers → saves power.
-
-| Metric | Without Clock Gating | With Clock Gating | Difference |
-|--------|---------------------|-------------------|------------|
-| Area (μm²) | ___ | ___ | ___% |
-| Dynamic Power (mW) | ___ | ___ | ___% |
-| Leakage Power (μW) | ___ | ___ | ___% |
-| Setup Slack (ns) | ___ | ___ | ___ |
-| Clock Gates | 0 | ___ | N/A |
-
-*(Fill in after running both syntheses)*
-
----
-
-## Maximum Frequency Calculation
-
-From timing report:
-```
-Clock period = 10ns (100 MHz target)
-Slack = X ns
-
-Minimum period = 10ns - slack
-Max frequency = 1 / minimum period
-```
-
----
-
-## Files Generated After Synthesis
-
-```
-switch_4port_netlist.v          # Gate-level netlist
-switch_4port_netlist_clkgate.v  # Netlist with clock gating
-timing_report.txt               # Critical paths, slack
-area_report.txt                 # Cell count, area
-power_report.txt                # Dynamic + leakage power
-qor_report.txt                  # Quality of Results summary
-clock_gating_report.txt         # Clock gating statistics
-gate_sim.log                    # Gate-level simulation log
-```
-
----
-
-## Submission Checklist
-
-- [ ] Run synthesis (no clock gating)
-- [ ] Run synthesis (with clock gating)  
-- [ ] Run gate-level simulation (both)
-- [ ] Compare timing/area/power reports
-- [ ] Fill in analysis tables above
-- [ ] Verify gate-level sim matches RTL behavior
+## License
+Educational use only.

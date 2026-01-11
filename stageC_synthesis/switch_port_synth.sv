@@ -1,6 +1,3 @@
-// Synthesizable switch port module (no $display, no class references)
-// This is the synthesizable version - removes all verification-only constructs
-
 module switch_port_synth #(
   parameter FIFO_DEPTH = 16,
   parameter ADDR_WIDTH = 4,

@@ -1,7 +1,3 @@
-// Gate-Level Simulation Testbench for 4-Port Network Switch
-// This runs the same tests as Stage B to verify synthesis correctness
-// Uses the netlist instead of RTL
-
 `timescale 1ns/1ps
 
 module switch_test_gate;
@@ -106,9 +102,9 @@ module switch_test_gate;
 
   // Main test
   initial begin
-    $display("\n========================================");
+    $display("\n");
     $display("GATE-LEVEL SIMULATION");
-    $display("========================================\n");
+    $display("\n");
     
     errors = 0; packets_sent = 0; packets_received = 0;
     reset();
@@ -161,9 +157,9 @@ module switch_test_gate;
 
     repeat(50) @(posedge clk);
 
-    $display("\n========================================");
+    $display("\n");
     $display("GATE-LEVEL SIMULATION COMPLETE");
-    $display("========================================");
+    $display("");
     $display("Packets sent:     %0d", packets_sent);
     $display("Packets received: %0d", packets_received);
     
@@ -172,7 +168,7 @@ module switch_test_gate;
     else
       $display("\n*** GATE-LEVEL TEST FAILED: %0d errors ***", errors);
     
-    $display("========================================\n");
+    $display("\n");
     $finish;
   end
 

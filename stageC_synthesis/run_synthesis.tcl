@@ -1,11 +1,7 @@
-# Synthesis Script for 4-Port Network Switch (NO clock gating)
-# Tool: Synopsys Fusion Compiler
-# Run: fc_shell then source run_synthesis.tcl
-
-puts "=========================================="
+puts ""
 puts "Synthesis - 4-Port Network Switch"
 puts "Clock Gating: DISABLED"
-puts "=========================================="
+puts ""
 
 set_host_options -max_cores 4
 
@@ -93,8 +89,8 @@ puts "\nExporting netlist..."
 write_verilog -hierarchy ${WORK_DIR}/switch_4port_netlist.v
 write_sdc ${WORK_DIR}/switch_synth.sdc
 
-puts "\n=========================================="
+puts "\n"
 puts "Synthesis Complete!"
 puts "Netlist: switch_4port_netlist.v"
 puts "Reports: *_report.txt"
-puts "=========================================="
+puts ""
