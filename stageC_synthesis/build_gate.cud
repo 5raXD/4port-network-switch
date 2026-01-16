@@ -1,0 +1,9 @@
+# Gate-level simulation file list for 4-Port Switch
+# Standard cell Verilog models (SAED 32nm)
+-v /data/synopsys/lib/SAED32_EDK/lib/stdcell_hvt/verilog/saed32nm_hvt.v
+-v /data/synopsys/lib/SAED32_EDK/lib/stdcell_rvt/verilog/saed32nm_rvt.v
+-v /data/synopsys/lib/SAED32_EDK/lib/stdcell_lvt/verilog/saed32nm_lvt.v
+
+# Gate-level netlist and testbench
+switch_test_gate.sv
+switch_4port_netlist.v

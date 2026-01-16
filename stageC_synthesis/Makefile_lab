@@ -1,0 +1,109 @@
+# STAGE B: RTL SIMULATION (Original Design)
+RTL_SRCS = packet_pkg.sv port_if.sv switch_port.sv switch_4port.sv coverage_module.sv switch_test.sv
+
+rtl-sim: rtl-comp rtl-run
+
+rtl-comp:
+	@echo "=== Compiling RTL ==="
+	vcs -f build.cud -sverilog -kdb +vcs+fsdbon
+
+rtl-run:
+	@echo "=== Running RTL Simulation ==="
+	./simv 2>&1 | tee rtl_sim.log
+
+# STAGE C: GATE-LEVEL SIMULATION (After Synthesis)
+GATE_NETLIST = switch_4port_netlist.v
+SDF_FILE = switch.sdf
+
+# Standard cell library for gate-level simulation
+SAED_VERILOG = /data/synopsys/lib/saed32nm/ref/verilog
+
+# Gate-level testbench
+GATE_TB = switch_test_gate.sv
+
+gate-sim: gate-comp gate-run
+
+gate-comp:
+	@echo "=== Compiling Gate-Level Netlist ==="
+	@echo "Using SDF: $(SDF_FILE)"
+	vcs -sverilog -kdb +vcs+fsdbon \
+		+v2k \
+		+define+GATE_SIM \
+		-v $(SAED_VERILOG)/saed32nm.v \
+		-v $(SAED_VERILOG)/saed32nm_hvt.v \
+		-v $(SAED_VERILOG)/saed32nm_lvt.v \
+		-v $(SAED_VERILOG)/saed32nm_rvt.v \
+		$(GATE_NETLIST) \
+		$(GATE_TB) \
+		-sdf typ:switch_test_gate.dut:$(SDF_FILE) \
+		-o simv_gate
+
+gate-run:
+	@echo "=== Running Gate-Level Simulation ==="
+	./simv_gate 2>&1 | tee gate_sim.log
+
+# GATE-LEVEL WITH CLOCK GATING (compare results)
+GATE_NETLIST_CLK = switch_4port_netlist_clkgate.v
+SDF_FILE_CLK = switch_clkgate.sdf
+
+gate-clkgate-sim: gate-clkgate-comp gate-clkgate-run
+
+gate-clkgate-comp:
+	@echo "=== Compiling Gate-Level Netlist (Clock Gating) ==="
+	vcs -sverilog -kdb +vcs+fsdbon \
+		+v2k \
+		+define+GATE_SIM \
+		-v $(SAED_VERILOG)/saed32nm.v \
+		-v $(SAED_VERILOG)/saed32nm_hvt.v \
+		-v $(SAED_VERILOG)/saed32nm_lvt.v \
+		-v $(SAED_VERILOG)/saed32nm_rvt.v \
+		$(GATE_NETLIST_CLK) \
+		$(GATE_TB) \
+		-sdf typ:switch_test_gate.dut:$(SDF_FILE_CLK) \
+		-o simv_gate_clkgate
+
+gate-clkgate-run:
+	@echo "=== Running Gate-Level Simulation (Clock Gating) ==="
+	./simv_gate_clkgate 2>&1 | tee gate_clkgate_sim.log
+
+wave:
+	verdi -ssf novas.fsdb &
+
+
+clean:
+	@echo "=== Cleaning ==="
+	rm -rf simv* csrc* *.fsdb *.rc *.key verdi_config_file verdiLog *.conf
+	rm -rf *.log *.dlib *.dSYM DVEfiles *.vpd ucli.key
+	@echo "Clean complete"
+
+clean-synth:
+	@echo "=== Cleaning Synthesis Files ==="
+	rm -rf *.dlib *_report*.txt *.sdc switch.sdf switch_clkgate.sdf
+	rm -rf switch_4port_netlist*.v
+	@echo "Synthesis files cleaned"
+
+
+help:
+	@echo ""
+	@echo "=== 4-Port Switch - Lab Computer Makefile ==="
+	@echo ""
+	@echo "Stage B (RTL Simulation):"
+	@echo "  make rtl-sim          - Run RTL simulation"
+	@echo ""
+	@echo "Stage C (Synthesis & Gate-Level):"
+	@echo "  1. Run synthesis first (see below)"
+	@echo "  2. make gate-sim      - Gate-level simulation (no clock gating)"
+	@echo "  3. make gate-clkgate-sim - Gate-level simulation (with clock gating)"
+	@echo ""
+	@echo "Utilities:"
+	@echo "  make wave             - Open waveform viewer"
+	@echo "  make clean            - Remove simulation files"
+	@echo "  make clean-synth      - Remove synthesis outputs"
+	@echo ""
+	@echo "Synthesis Commands (run in fc_shell):"
+	@echo "  fc_shell -f run_synth_lab.tcl | tee synth.log"
+	@echo "  fc_shell -f run_synth_lab_clkgate.tcl | tee synth_clkgate.log"
+	@echo ""
+
+.PHONY: rtl-sim rtl-comp rtl-run gate-sim gate-comp gate-run gate-clkgate-sim gate-clkgate-comp gate-clkgate-run wave clean clean-synth help
+

@@ -1,0 +1,211 @@
+****************************************
+Report : area
+Design : switch_4port_synth
+Version: V-2023.12-SP3
+Date   : Thu Jan 15 12:36:58 2026
+****************************************
+
+Number of ports:                         1474
+Number of nets:                          4835
+Number of cells:                         2888
+Number of combinational cells:           1586
+Number of sequential cells:              1302
+Number of macros/black boxes:               0
+Number of buf/inv:                        622
+Number of references:                      23
+
+Combinational area:                   1069.44
+Buf/Inv area:                          264.31
+Noncombinational area:                   0.00
+Macro/Black Box area:                    0.00
+
+Total cell area:                      1069.44
+
+Hierarchical area distribution
+------------------------------
+
+                                  Global cell area                  Local cell area
+                                  -------------------------------------------------------------
+Hierarchical cell                 Absolute      Percent  Combi-       Noncombi-    Black-
+                                  Total         Total    national     national     boxes         Design
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+switch_4port_synth                     1069.44    100.0         0.00         0.00          0.00  switch_4port_synth
+add_159_C175                             17.28      1.6         0.00         0.00          0.00  ADD_UNS_OP_J1_D1
+add_159_C175/U0                          17.28      1.6        17.28         0.00          0.00  DW01_add_J1_D1
+add_159_C175_I2                          17.28      1.6         0.00         0.00          0.00  ADD_UNS_OP_J1_D1
+add_159_C175_I2/U0                       17.28      1.6        17.28         0.00          0.00  DW01_add_J1_D1
+add_159_C175_I3                          17.28      1.6         0.00         0.00          0.00  ADD_UNS_OP_J1_D1
+add_159_C175_I3/U0                       17.28      1.6        17.28         0.00          0.00  DW01_add_J1_D1
+add_159_C175_I4                          17.28      1.6         0.00         0.00          0.00  ADD_UNS_OP_J1_D1
+add_159_C175_I4/U0                       17.28      1.6        17.28         0.00          0.00  DW01_add_J1_D1
+add_159_I2_C175                          17.28      1.6         0.00         0.00          0.00  ADD_UNS_OP_J2_D1
+add_159_I2_C175/U0                       17.28      1.6        17.28         0.00          0.00  DW01_add_J2_D1
+add_159_I2_C175_I2                       17.28      1.6         0.00         0.00          0.00  ADD_UNS_OP_J2_D1
+add_159_I2_C175_I2/U0                    17.28      1.6        17.28         0.00          0.00  DW01_add_J2_D1
+add_159_I2_C175_I3                       17.28      1.6         0.00         0.00          0.00  ADD_UNS_OP_J2_D1
+add_159_I2_C175_I3/U0                    17.28      1.6        17.28         0.00          0.00  DW01_add_J2_D1
+add_159_I2_C175_I4                       17.28      1.6         0.00         0.00          0.00  ADD_UNS_OP_J2_D1
+add_159_I2_C175_I4/U0                    17.28      1.6        17.28         0.00          0.00  DW01_add_J2_D1
+add_159_I3_C175                          17.28      1.6         0.00         0.00          0.00  ADD_UNS_OP_J2_D1
+add_159_I3_C175/U0                       17.28      1.6        17.28         0.00          0.00  DW01_add_J2_D1
+add_159_I3_C175_I2                       17.28      1.6         0.00         0.00          0.00  ADD_UNS_OP_J2_D1
+add_159_I3_C175_I2/U0                    17.28      1.6        17.28         0.00          0.00  DW01_add_J2_D1
+add_159_I3_C175_I3                       17.28      1.6         0.00         0.00          0.00  ADD_UNS_OP_J2_D1
+add_159_I3_C175_I3/U0                    17.28      1.6        17.28         0.00          0.00  DW01_add_J2_D1
+add_159_I3_C175_I4                       17.28      1.6         0.00         0.00          0.00  ADD_UNS_OP_J2_D1
+add_159_I3_C175_I4/U0                    17.28      1.6        17.28         0.00          0.00  DW01_add_J2_D1
+gen_ports[0].port_inst                  193.15     18.1         0.00         0.00          0.00  switch_port_synth_FIFO_DEPTH16_PORT_ID0
+gen_ports[0].port_inst/add_123           32.28      3.0         0.00         0.00          0.00  ADD_UNS_OP_J3_D1
+gen_ports[0].port_inst/add_123/U0
+                                         32.28      3.0        32.28         0.00          0.00  DW01_add_J3_D1
+gen_ports[0].port_inst/add_135_S2
+                                         32.28      3.0         0.00         0.00          0.00  ADD_UNS_OP_J3_D1
+gen_ports[0].port_inst/add_135_S2/U0
+                                         32.28      3.0        32.28         0.00          0.00  DW01_add_J3_D1
+gen_ports[0].port_inst/add_141           39.90      3.7         0.00         0.00          0.00  ADD_UNS_OP_J5_D1
+gen_ports[0].port_inst/add_141/U0
+                                         39.90      3.7        39.90         0.00          0.00  DW01_add_J5_D1
+gen_ports[0].port_inst/sub_142           48.80      4.6         0.00         0.00          0.00  SUB_UNS_OP_J4_D1
+gen_ports[0].port_inst/sub_142/U0
+                                         48.80      4.6        48.80         0.00          0.00  DW01_sub_J4_D1
+gen_ports[0].port_inst/sub_65_C69_C73_C80
+                                         39.90      3.7         0.00         0.00          0.00  SUB_UNS_OP_J6_D1
+gen_ports[0].port_inst/sub_65_C69_C73_C80/U0
+                                         39.90      3.7        39.90         0.00          0.00  DW01_sub_J6_D1
+gen_ports[1].port_inst                  193.15     18.1         0.00         0.00          0.00  switch_port_synth_FIFO_DEPTH16_PORT_ID1
+gen_ports[1].port_inst/add_123           32.28      3.0         0.00         0.00          0.00  ADD_UNS_OP_J3_D1
+gen_ports[1].port_inst/add_123/U0
+                                         32.28      3.0        32.28         0.00          0.00  DW01_add_J3_D1
+gen_ports[1].port_inst/add_135_S2
+                                         32.28      3.0         0.00         0.00          0.00  ADD_UNS_OP_J3_D1
+gen_ports[1].port_inst/add_135_S2/U0
+                                         32.28      3.0        32.28         0.00          0.00  DW01_add_J3_D1
+gen_ports[1].port_inst/add_141           39.90      3.7         0.00         0.00          0.00  ADD_UNS_OP_J5_D1
+gen_ports[1].port_inst/add_141/U0
+                                         39.90      3.7        39.90         0.00          0.00  DW01_add_J5_D1
+gen_ports[1].port_inst/sub_142           48.80      4.6         0.00         0.00          0.00  SUB_UNS_OP_J4_D1
+gen_ports[1].port_inst/sub_142/U0
+                                         48.80      4.6        48.80         0.00          0.00  DW01_sub_J4_D1
+gen_ports[1].port_inst/sub_65_C69_C73_C80
+                                         39.90      3.7         0.00         0.00          0.00  SUB_UNS_OP_J6_D1
+gen_ports[1].port_inst/sub_65_C69_C73_C80/U0
+                                         39.90      3.7        39.90         0.00          0.00  DW01_sub_J6_D1
+gen_ports[2].port_inst                  193.15     18.1         0.00         0.00          0.00  switch_port_synth_FIFO_DEPTH16_PORT_ID2
+gen_ports[2].port_inst/add_123           32.28      3.0         0.00         0.00          0.00  ADD_UNS_OP_J3_D1
+gen_ports[2].port_inst/add_123/U0
+                                         32.28      3.0        32.28         0.00          0.00  DW01_add_J3_D1
+gen_ports[2].port_inst/add_135_S2
+                                         32.28      3.0         0.00         0.00          0.00  ADD_UNS_OP_J3_D1
+gen_ports[2].port_inst/add_135_S2/U0
+                                         32.28      3.0        32.28         0.00          0.00  DW01_add_J3_D1
+gen_ports[2].port_inst/add_141           39.90      3.7         0.00         0.00          0.00  ADD_UNS_OP_J5_D1
+gen_ports[2].port_inst/add_141/U0
+                                         39.90      3.7        39.90         0.00          0.00  DW01_add_J5_D1
+gen_ports[2].port_inst/sub_142           48.80      4.6         0.00         0.00          0.00  SUB_UNS_OP_J4_D1
+gen_ports[2].port_inst/sub_142/U0
+                                         48.80      4.6        48.80         0.00          0.00  DW01_sub_J4_D1
+gen_ports[2].port_inst/sub_65_C69_C73_C80
+                                         39.90      3.7         0.00         0.00          0.00  SUB_UNS_OP_J6_D1
+gen_ports[2].port_inst/sub_65_C69_C73_C80/U0
+                                         39.90      3.7        39.90         0.00          0.00  DW01_sub_J6_D1
+gen_ports[3].port_inst                  193.15     18.1         0.00         0.00          0.00  switch_port_synth_FIFO_DEPTH16_PORT_ID3
+gen_ports[3].port_inst/add_123           32.28      3.0         0.00         0.00          0.00  ADD_UNS_OP_J3_D1
+gen_ports[3].port_inst/add_123/U0
+                                         32.28      3.0        32.28         0.00          0.00  DW01_add_J3_D1
+gen_ports[3].port_inst/add_135_S2
+                                         32.28      3.0         0.00         0.00          0.00  ADD_UNS_OP_J3_D1
+gen_ports[3].port_inst/add_135_S2/U0
+                                         32.28      3.0        32.28         0.00          0.00  DW01_add_J3_D1
+gen_ports[3].port_inst/add_141           39.90      3.7         0.00         0.00          0.00  ADD_UNS_OP_J5_D1
+gen_ports[3].port_inst/add_141/U0
+                                         39.90      3.7        39.90         0.00          0.00  DW01_add_J5_D1
+gen_ports[3].port_inst/sub_142           48.80      4.6         0.00         0.00          0.00  SUB_UNS_OP_J4_D1
+gen_ports[3].port_inst/sub_142/U0
+                                         48.80      4.6        48.80         0.00          0.00  DW01_sub_J4_D1
+gen_ports[3].port_inst/sub_65_C69_C73_C80
+                                         39.90      3.7         0.00         0.00          0.00  SUB_UNS_OP_J6_D1
+gen_ports[3].port_inst/sub_65_C69_C73_C80/U0
+                                         39.90      3.7        39.90         0.00          0.00  DW01_sub_J6_D1
+rem_159_C175                              5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_C175/U0                           5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_C175/U0/u_div                     5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_C175/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+rem_159_C175_I2                           5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_C175_I2/U0                        5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_C175_I2/U0/u_div                  5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_C175_I2/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+rem_159_C175_I3                           5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_C175_I3/U0                        5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_C175_I3/U0/u_div                  5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_C175_I3/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+rem_159_C175_I4                           5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_C175_I4/U0                        5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_C175_I4/U0/u_div                  5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_C175_I4/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+rem_159_I2_C175                           5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_I2_C175/U0                        5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_I2_C175/U0/u_div                  5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_I2_C175/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+rem_159_I2_C175_I2                        5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_I2_C175_I2/U0                     5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_I2_C175_I2/U0/u_div               5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_I2_C175_I2/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+rem_159_I2_C175_I3                        5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_I2_C175_I3/U0                     5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_I2_C175_I3/U0/u_div               5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_I2_C175_I3/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+rem_159_I2_C175_I4                        5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_I2_C175_I4/U0                     5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_I2_C175_I4/U0/u_div               5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_I2_C175_I4/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+rem_159_I3_C175                           5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_I3_C175/U0                        5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_I3_C175/U0/u_div                  5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_I3_C175/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+rem_159_I3_C175_I2                        5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_I3_C175_I2/U0                     5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_I3_C175_I2/U0/u_div               5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_I3_C175_I2/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+rem_159_I3_C175_I3                        5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_I3_C175_I3/U0                     5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_I3_C175_I3/U0/u_div               5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_I3_C175_I3/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+rem_159_I3_C175_I4                        5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_I3_C175_I4/U0                     5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_I3_C175_I4/U0/u_div               5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_I3_C175_I4/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+rem_159_I4_C175                           5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_I4_C175/U0                        5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_I4_C175/U0/u_div                  5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_I4_C175/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+rem_159_I4_C175_I2                        5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_I4_C175_I2/U0                     5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_I4_C175_I2/U0/u_div               5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_I4_C175_I2/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+rem_159_I4_C175_I3                        5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_I4_C175_I3/U0                     5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_I4_C175_I3/U0/u_div               5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_I4_C175_I3/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+rem_159_I4_C175_I4                        5.59      0.5         0.00         0.00          0.00  REM_UNS_OP_J0_D1
+rem_159_I4_C175_I4/U0                     5.59      0.5         0.00         0.00          0.00  DW_div_uns_a_width2_b_width1_J0_D2
+rem_159_I4_C175_I4/U0/u_div               5.59      0.5         0.00         0.00          0.00  DW_div_a_width2_b_width1_tc_mode0_rem_mode1_J0_D3_D2
+rem_159_I4_C175_I4/U0/u_div/u_add_PartRem_0_0
+                                          5.59      0.5         5.59         0.00          0.00  DW01_add_J0_D3_D3_D1
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Total                                                        1069.44         0.00          0.00
+1

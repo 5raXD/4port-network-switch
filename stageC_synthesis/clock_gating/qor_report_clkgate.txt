@@ -1,0 +1,148 @@
+****************************************
+Report : qor
+Design : switch_4port_synth
+Version: V-2023.12-SP3
+Date   : Thu Jan 15 12:50:11 2026
+****************************************
+
+
+Scenario           'FUNC_Fast'
+Timing Path Group  '**in2reg_default**'
+----------------------------------------
+Levels of Logic:                      5
+Critical Path Length:              1.39
+Critical Path Slack:               7.61
+Critical Path Clk Period:         10.00
+Total Negative Slack:              0.00
+No. of Violating Paths:               0
+Worst Hold Violation:              0.00
+Total Hold Violation:              0.00
+No. of Hold Violations:               0
+----------------------------------------
+
+Scenario           'FUNC_Fast'
+Timing Path Group  '**reg2out_default**'
+----------------------------------------
+Levels of Logic:                      0
+Critical Path Length:              0.62
+Critical Path Slack:               8.73
+Critical Path Clk Period:         10.00
+Total Negative Slack:              0.00
+No. of Violating Paths:               0
+Worst Hold Violation:              0.00
+Total Hold Violation:              0.00
+No. of Hold Violations:               0
+----------------------------------------
+
+Scenario           'FUNC_Fast'
+Timing Path Group  'clk'
+----------------------------------------
+Levels of Logic:                     15
+Critical Path Length:              3.06
+Critical Path Slack:               6.29
+Critical Path Clk Period:         10.00
+Total Negative Slack:              0.00
+No. of Violating Paths:               0
+Worst Hold Violation:              0.00
+Total Hold Violation:              0.00
+No. of Hold Violations:               0
+----------------------------------------
+
+Scenario           'FUNC_Slow'
+Timing Path Group  '**in2reg_default**'
+----------------------------------------
+Levels of Logic:                      5
+Critical Path Length:              1.40
+Critical Path Slack:               7.60
+Critical Path Clk Period:         10.00
+Total Negative Slack:              0.00
+No. of Violating Paths:               0
+Worst Hold Violation:              0.00
+Total Hold Violation:              0.00
+No. of Hold Violations:               0
+----------------------------------------
+
+Scenario           'FUNC_Slow'
+Timing Path Group  '**reg2out_default**'
+----------------------------------------
+Levels of Logic:                      0
+Critical Path Length:              0.63
+Critical Path Slack:               8.72
+Critical Path Clk Period:         10.00
+Total Negative Slack:              0.00
+No. of Violating Paths:               0
+Worst Hold Violation:              0.00
+Total Hold Violation:              0.00
+No. of Hold Violations:               0
+----------------------------------------
+
+Scenario           'FUNC_Slow'
+Timing Path Group  'clk'
+----------------------------------------
+Levels of Logic:                     15
+Critical Path Length:              3.12
+Critical Path Slack:               6.23
+Critical Path Clk Period:         10.00
+Total Negative Slack:              0.00
+No. of Violating Paths:               0
+Worst Hold Violation:              0.00
+Total Hold Violation:              0.00
+No. of Hold Violations:               0
+----------------------------------------
+
+
+Cell Count
+----------------------------------------
+Hierarchical Cell Count:              4
+Hierarchical Port Count:            335
+Leaf Cell Count:                   1525
+Buf/Inv Cell Count:                 103
+Buf Cell Count:                      73
+Inv Cell Count:                      30
+Combinational Cell Count:           709
+   Single-bit Isolation Cell Count:                        0
+   Multi-bit Isolation Cell Count:                         0
+   Isolation Cell Banking Ratio:                           0.00%
+   Single-bit Level Shifter Cell Count:                    0
+   Multi-bit Level Shifter Cell Count:                     0
+   Level Shifter Cell Banking Ratio:                       0.00%
+   Single-bit ELS Cell Count:                              0
+   Multi-bit ELS Cell Count:                               0
+   ELS Cell Banking Ratio:                                 0.00%
+Sequential Cell Count:              816
+   Integrated Clock-Gating Cell Count:                     64
+   Sequential Macro Cell Count:                            0
+   Single-bit Sequential Cell Count:                       752
+   Multi-bit Sequential Cell Count:                        0
+   Sequential Cell Banking Ratio:                          0.00%
+   BitsPerflop:                                            1.00
+Macro Count:                          0
+----------------------------------------
+
+
+Area
+----------------------------------------
+Combinational Area:             1876.35
+Noncombinational Area:          7265.47
+Buf/Inv Area:                    243.98
+Total Buffer Area:               204.84
+Total Inverter Area:              39.14
+Macro/Black Box Area:              0.00
+Net Area:                             0
+Net XLength:                   13867.25
+Net YLength:                   16462.68
+----------------------------------------
+Cell Area (netlist):                           9141.81
+Cell Area (netlist and physical only):         9141.81
+Net Length:                    30329.93
+
+
+Design Rules
+----------------------------------------
+Total Number of Nets:              1622
+Nets with Violations:                 1
+Max Trans Violations:                 0
+Max Cap Violations:                   1
+----------------------------------------
+
+1

@@ -1,0 +1,113 @@
+# Makefile for Gate-Level Simulation on Lab Computer (Euclide/VCS)
+# Based on instructor's email for SDF back-annotation
+
+# Standard cell Verilog models location
+SAED_VERILOG = /data/synopsys/lib/saed32nm/ref/verilog
+
+#===============================================================================
+# GATE-LEVEL SIMULATION WITHOUT CLOCK GATING
+#===============================================================================
+NETLIST_NO_CG = switch_4port_netlist.v
+SDF_NO_CG = switch.sdf
+GATE_TB = switch_test_gate.sv
+
+gate-sim: gate-comp gate-run
+
+gate-comp:
+	@echo "=============================================="
+	@echo " Gate-Level Simulation (NO Clock Gating)"
+	@echo " SDF: $(SDF_NO_CG)"
+	@echo "=============================================="
+	vcs -sverilog -kdb +vcs+fsdbon \
+		+v2k \
+		+neg_tchk \
+		-v $(SAED_VERILOG)/saed32nm.v \
+		-v $(SAED_VERILOG)/saed32nm_hvt.v \
+		-v $(SAED_VERILOG)/saed32nm_lvt.v \
+		-v $(SAED_VERILOG)/saed32nm_rvt.v \
+		$(NETLIST_NO_CG) \
+		$(GATE_TB) \
+		-sdf typ:switch_test_gate.dut:$(SDF_NO_CG) \
+		-o simv_gate
+
+gate-run:
+	@echo ">>> Running gate-level simulation..."
+	./simv_gate 2>&1 | tee gate_sim.log
+	@echo ">>> Gate-level simulation complete. Check gate_sim.log"
+
+#===============================================================================
+# GATE-LEVEL SIMULATION WITH CLOCK GATING
+#===============================================================================
+NETLIST_CG = switch_4port_netlist_clkgate.v
+SDF_CG = switch_clkgate.sdf
+
+gate-clkgate-sim: gate-clkgate-comp gate-clkgate-run
+
+gate-clkgate-comp:
+	@echo "=============================================="
+	@echo " Gate-Level Simulation (WITH Clock Gating)"
+	@echo " SDF: $(SDF_CG)"
+	@echo "=============================================="
+	vcs -sverilog -kdb +vcs+fsdbon \
+		+v2k \
+		+neg_tchk \
+		-v $(SAED_VERILOG)/saed32nm.v \
+		-v $(SAED_VERILOG)/saed32nm_hvt.v \
+		-v $(SAED_VERILOG)/saed32nm_lvt.v \
+		-v $(SAED_VERILOG)/saed32nm_rvt.v \
+		$(NETLIST_CG) \
+		$(GATE_TB) \
+		-sdf typ:switch_test_gate.dut:$(SDF_CG) \
+		-o simv_gate_clkgate
+
+gate-clkgate-run:
+	@echo ">>> Running gate-level simulation (clock gating)..."
+	./simv_gate_clkgate 2>&1 | tee gate_clkgate_sim.log
+	@echo ">>> Gate-level simulation complete. Check gate_clkgate_sim.log"
+
+#===============================================================================
+# RTL SIMULATION (Stage B - for reference)
+#===============================================================================
+rtl-sim:
+	vcs -f build.cud -sverilog -kdb +vcs+fsdbon
+	./simv 2>&1 | tee rtl_sim.log
+
+#===============================================================================
+# WAVEFORM VIEWER
+#===============================================================================
+wave:
+	verdi -ssf novas.fsdb &
+
+#===============================================================================
+# CLEAN
+#===============================================================================
+clean:
+	@echo ">>> Cleaning..."
+	rm -rf simv* csrc* *.fsdb *.rc *.key verdi_config_file verdiLog
+	rm -rf *.log DVEfiles *.vpd ucli.key *.daidir *.vdb
+	@echo ">>> Clean complete"
+
+#===============================================================================
+# HELP
+#===============================================================================
+help:
+	@echo ""
+	@echo "=== Gate-Level Simulation Makefile ==="
+	@echo ""
+	@echo "Commands:"
+	@echo "  make gate-sim         - Gate-level sim (no clock gating)"
+	@echo "  make gate-clkgate-sim - Gate-level sim (with clock gating)"
+	@echo "  make rtl-sim          - RTL simulation (Stage B)"
+	@echo "  make wave             - Open waveform viewer"
+	@echo "  make clean            - Remove generated files"
+	@echo ""
+	@echo "Required files in current directory:"
+	@echo "  - switch_4port_netlist.v (from no_clock_gating/)"
+	@echo "  - switch.sdf (from no_clock_gating/)"
+	@echo "  - switch_4port_netlist_clkgate.v (from clock_gating/)"
+	@echo "  - switch_clkgate.sdf (from clock_gating/)"
+	@echo "  - switch_test_gate.sv (testbench)"
+	@echo ""
+
+.PHONY: gate-sim gate-comp gate-run gate-clkgate-sim gate-clkgate-comp gate-clkgate-run rtl-sim wave clean help
+

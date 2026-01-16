@@ -1,0 +1,275 @@
+********************************************************************************
+* FOUR-PORT SWITCH PROJECT: DETAILED SPECIFICATION           *
+* Course: Design, Verification and Logical Synthesis for VLSI      *
+* Tel Aviv University - Faculty of Engineering               *
+********************************************************************************
+
+1. INTRODUCTION & CORE OBJECTIVES
+================================================================================
+This project simulates a full hardware development flow for a simplified four-port 
+packet switch. You are required to design the RTL, build a complete SystemVerilog 
+[cite_start]verification environment (without UVM), and perform logical synthesis[cite: 17].
+
+Core Rules:
+- No UVM or external libraries allowed; you must build the Verification 
+  [cite_start]Components (VC) from scratch[cite: 29].
+- The design must handle concurrent packet arrivals (simultaneous inputs on 
+  [cite_start]multiple ports) without dropping, duplicating, or corrupting data[cite: 26].
+- Output contention must be handled via arbitration (e.g., Round-Robin) and 
+  [cite_start]buffering (FIFO)[cite: 27].
+
+2. PACKET SPECIFICATION
+================================================================================
+[cite_start]The switch operates on 16-bit packets split into a Header and a Payload[cite: 61].
+
+Packet Structure (16 bits total):
+---------------------------------
+| Byte 0 (Header)     | Byte 1 (Payload) |
+|---------------------|------------------|
+| Bits 7-4 | Bits 3-0 | Bits 7-0         |
+| TARGET   | SOURCE   | DATA             |
+
+Field Definitions:
+1. [cite_start]Source (4 bits): One-hot encoded ID of the input port[cite: 62].
+   - Port 0: 4'b0001
+   - Port 1: 4'b0010
+   - Port 2: 4'b0100
+   - [cite_start]Port 3: 4'b1000 [cite: 86]
+
+2. [cite_start]Target (4 bits): One-hot mask indicating destination port(s)[cite: 63].
+
+3. [cite_start]Data (8 bits): The payload information[cite: 65].
+
+Packet Types:
+1. Single-Destination: Target has exactly 1 bit set. Target port cannot match 
+   [cite_start]Source port[cite: 91, 92].
+2. Multicast: Target has 2 or 3 bits set. The Source port bit must NOT be 
+   [cite_start]present in the Target mask[cite: 94, 95].
+3. [cite_start]Broadcast: Target is 4'b1111 (all ports)[cite: 99].
+
+3. STAGE A: RTL DESIGN (20% of Grade)
+================================================================================
+[cite_start]DEADLINE: 13/12/2025 [cite: 277]
+
+[cite_start]You must implement the Switch RTL using Verilog or SystemVerilog[cite: 145].
+
+Design Requirements:
+- Finite State Machine (FSM): Must define clear states such as Idle, Receive, 
+  [cite_start]Route, and Transmit[cite: 148].
+- Modularity: Divide logic into sub-modules (e.g., Input Parser, Router, 
+  [cite_start]Output Mux)[cite: 150].
+- Coding Style: 
+  - [cite_start]Use parametric coding (e.g., `parameter NUM_PORTS=4`)[cite: 151].
+  - [cite_start]Use `DEFINE` macros for constants[cite: 151].
+  - [cite_start]Correctly distinguish between `reg` and `wire`[cite: 130].
+  - [cite_start]Use completion logic (done flags) to signal process ends[cite: 149].
+
+Deliverables for Stage A:
+- RTL source files.
+- Basic QA testbenches proving compilation and basic forwarding.
+- [cite_start]Block diagrams and FSM State diagrams [cite: 153-157].
+
+4. STAGE B: VERIFICATION ENVIRONMENT (20% of Grade)
+================================================================================
+[cite_start]DEADLINE: 28/12/2025 [cite: 278]
+
+You must build an Object-Oriented (OOP) verification environment.
+
+I. Packet Model (Class)
+-----------------------
+[cite_start]Create a SystemVerilog class containing `source`, `target`, `data`, and `type`[cite: 105, 106].
+- Randomization: Fields must be `rand` with constraints to ensure valid packets 
+  (no zero targets, no source/target overlaps) [cite_start][cite: 112, 120].
+- [cite_start]Features: Static instance counter, print method, and unique tags for debug[cite: 114, 115].
+
+II. Verification Components (Modular Architecture)
+--------------------------------------------------
+1. [cite_start]Base Class: Parent pointer, hierarchy paths, print methods[cite: 164].
+2. [cite_start]Sequencer: Generates pseudo-random packets and sends them to the driver[cite: 168].
+3. Driver: Takes packets from Sequencer, drives them into the DUT via 
+   [cite_start]Virtual Interface[cite: 172, 173].
+4. [cite_start]Monitor: Samples the interface to reconstruct packets exiting the switch[cite: 178].
+5. [cite_start]Agent: Encapsulates one Sequencer, Driver, and Monitor[cite: 182].
+6. Packet_VC: Top-level component for a single port. Configures the Agent and 
+   [cite_start]virtual interface[cite: 186].
+
+III. The Checker (Critical)
+---------------------------
+You must implement an automated Checker that:
+- [cite_start]Receives expected packets (from Sequencer) and actual packets (from Monitor)[cite: 195].
+- [cite_start]Validates data integrity and correct routing[cite: 196].
+- [cite_start]Confirms arbitration works (no packet drops during contention)[cite: 203].
+- [cite_start]Uses assertions to flag errors[cite: 202].
+
+IV. Full System Verification
+----------------------------
+You must instantiate four Packet_VC components in parallel (one per port) to 
+[cite_start]verify the full 4-port switch under concurrent load [cite: 219-224].
+
+5. STAGE C: SYNTHESIS (60% of Grade)
+================================================================================
+[cite_start]DEADLINE: 20/01/2026 [cite: 278]
+
+This stage carries the most weight. You will use Synopsys Design Compiler (or equivalent).
+
+Tasks:
+1. [cite_start]Synthesis: Convert RTL to Gate-Level netlist[cite: 246].
+2. [cite_start]Validation: Run Gate-Level Simulation (GLS) to verify functionality post-synthesis[cite: 247].
+3. Optimization Analysis:
+   - [cite_start]Compare results with and without Clock Gating[cite: 248].
+   - [cite_start]Analyze Max Frequency (Slack analysis)[cite: 250].
+   - [cite_start]Analyze Area and Power consumption[cite: 252].
+   - [cite_start]Analyze Resource Utilization (Logic elements, memory)[cite: 253].
+
+6. GRADING BREAKDOWN
+================================================================================
+
+STAGE A (20%)
+-------------
+- [cite_start]10%: FSM implementation, Clock/Reset logic, Modular design, Case transitions[cite: 283].
+- [cite_start]5%:  Code quality (Parametric coding, Defines, Loops, Functions)[cite: 284].
+- [cite_start]5%:  Basic QA tests, Simulation logs, Diagrams[cite: 285].
+
+STAGE B (20%)
+-------------
+- [cite_start]8%:  Architecture (Sequencer, Driver, Monitor, Agent, VC integration)[cite: 288].
+- [cite_start]4%:  Packet Model (Constraints, Randomization, BFM)[cite: 290].
+- [cite_start]4%:  Checker implementation and validation[cite: 291].
+- [cite_start]3%:  Functional Coverage and testing all FSM parts[cite: 292].
+- [cite_start]1%:  Transcripts and Reports[cite: 293].
+
+STAGE C (60%)
+-------------
+- [cite_start]20%: Synthesis execution, Gate-level verification, Slack analysis, Clock gating[cite: 295].
+- [cite_start]15%: Resource analysis (Area/Power/Memory) and Runtime performance[cite: 296].
+- [cite_start]15%: Correct Coding Practices applied across the *entire* project (Modules, FSMs, Wiring)[cite: 296].
+- [cite_start]10%: Submission Quality (Organization, Results analysis, Code comments)[cite: 297].
+
+BONUS (+5%)
+-----------
+Up to 5% extra credit for optional features like Code Coverage analysis or 
+[cite_start]Formal Verification (Assertions)[cite: 300, 239].
+
+7. PROVIDED FILES VS. YOUR WORK
+================================================================================
+Provided Skeleton Files:
+- [cite_start]`port_if.sv` (Interface), `packet_pkg.sv` (Package)[cite: 135, 138].
+- [cite_start]`vc_test.sv`, `switch_test.sv` (Testbenches)[cite: 136, 137].
+- `packet_data.sv`, `component_base.sv`, `sequencer.sv`, `driver.sv`, 
+  [cite_start]`monitor.sv`, `agent.sv`, `packet_vc.sv`[cite: 139].
+
+You Must Implement:
+- [cite_start]Full RTL (`switch_port.sv`, `switch_4port.sv`)[cite: 142].
+- Content of all skeleton verification files.
+- [cite_start]The Checker component (not provided in skeleton, must be created)[cite: 193].
+*******detailed stage C
+(PROJECT STAGE C: SYNTHESIS AND PERFORMANCE ANALYSIS
+================================================================================
+Weight: 60% of Total Grade
+Deadline: 20/01/2026
+
+1. OVERVIEW
+--------------------------------------------------------------------------------
+Stage C is the final and most critical phase of the Four-Port Switch project. 
+It involves converting your RTL design into a physical gate-level representation 
+using a synthesis tool (e.g., Synopsys Design Compiler) and analyzing its 
+[cite_start]performance[cite: 245, 246].
+
+You must prove that your design is not only logically correct but also 
+efficient in terms of speed, area, and power.
+
+2. CORE TASKS
+--------------------------------------------------------------------------------
+
+A. RTL Synthesis
+   - [cite_start]Goal: Synthesize the RTL into a Gate-Level Netlist[cite: 246].
+   - [cite_start]Tool: Synopsys Design Compiler (DC) or equivalent[cite: 246].
+   - Requirement: You must write synthesis scripts to load the design, apply 
+     [cite_start]constraints, and generate the netlist[cite: 257].
+
+B. Gate-Level Simulation (GLS)
+   - [cite_start]Goal: Validate the synthesized netlist[cite: 247].
+   - Process: Take the verification environment you built in Stage B and 
+     run it against the new gate-level netlist instead of the RTL.
+   - Outcome: The simulation logs must show that the netlist functions 
+     [cite_start]identically to the RTL[cite: 258].
+
+C. The Clock Gating Experiment
+   - Goal: Analyze power optimization techniques.
+   - [cite_start]Requirement: You must perform synthesis twice[cite: 248, 259]:
+     1. Without Clock Gating.
+     2. With Clock Gating enabled.
+   - Comparison: You must explicitly compare the results (Area vs. Power) 
+     [cite_start]between these two runs[cite: 259].
+
+3. REQUIRED ANALYSIS & METRICS
+--------------------------------------------------------------------------------
+[cite_start]You are required to produce tables and graphs analyzing the following[cite: 259]:
+
+1. [cite_start]Maximum Frequency & Slack [cite: 250]
+   - Perform a "Slack Analysis."
+   - Determine the maximum operating frequency of your switch.
+   - Identify critical paths.
+
+2. [cite_start]Area & Power Consumption [cite: 252]
+   - Calculate total area usage.
+   - Calculate power consumption (Dynamic vs. Leakage).
+
+3. [cite_start]Resource Utilization [cite: 253]
+   - Break down the hardware usage:
+     * Logic Elements (Combinational logic).
+     * Memory elements (Registers/Buffers).
+     * Interconnects.
+
+4. [cite_start]Runtime Performance [cite: 255]
+   - Analyze the efficiency of the design during operation.
+
+4. DETAILED GRADING CRITERIA (60% TOTAL)
+--------------------------------------------------------------------------------
+The grading for Stage C is divided into three specific categories:
+
+[cite_start]PART 1: Synthesis Execution (20%) [cite: 295]
+   - Successful synthesis execution.
+   - Gate-Level Verification (GLS) passing.
+   - Comparison of Clock Gating (Enabled vs. Disabled).
+   - Maximum Frequency (Slack) Analysis.
+
+[cite_start]PART 2: Resource & Efficiency Analysis (15%) [cite: 296]
+   - Accuracy of Area and Power calculations.
+   - Memory usage analysis.
+   - Runtime analysis.
+
+[cite_start]PART 3: Correct Coding Practices (15%) [cite: 296]
+   *CRITICAL NOTE:* This score evaluates your code from the ENTIRE project (Stages A, B, & C).
+   The grader will review your source code for:
+   - [cite_start]Parametric coding (using `parameter` and `define`)[cite: 296].
+   - [cite_start]Proper use of Functions and Loops[cite: 296].
+   - [cite_start]Correct distinction between `reg` and `wire`[cite: 296].
+   - [cite_start]Modular design integrity[cite: 296].
+   - [cite_start]Completion logic and wiring[cite: 296].
+   - [cite_start]Full block diagrams and detailed logical design descriptions[cite: 296].
+
+[cite_start]PART 4: Submission Quality (10%) [cite: 297]
+   - Organization of the submission.
+   - Quality of results explanation (Graphs/Tables).
+   - Code comments (must explain modules, functions, special cases).
+   - Explanation of FSM cases.
+
+5. DELIVERABLES
+--------------------------------------------------------------------------------
+You must submit the following items for Stage C:
+
+1. [cite_start]Synthesis Files[cite: 257, 258]:
+   - All synthesis scripts used.
+   - The generated Gate-Level Netlist.
+   - Synthesis Reports (Area, Power, Timing).
+
+2. [cite_start]Simulation Logs[cite: 258]:
+   - Transcripts showing the Gate-Level Simulation running and passing.
+
+3. [cite_start]Final Report[cite: 259, 263]:
+   - Analysis: Tables and graphs showing Area/Power/Frequency.
+   - Comparisons: Data showing the impact of Clock Gating.
+   - Design Documentation: Updated block diagrams, state diagrams, and 
+     [cite_start]data flow descriptions[cite: 270].
+   - [cite_start]Issues: Description of issues encountered and resolutions[cite: 272].)

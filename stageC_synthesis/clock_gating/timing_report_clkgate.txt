@@ -1,0 +1,68 @@
+****************************************
+Report : timing
+        -path_type full
+        -delay_type max
+        -max_paths 1
+        -report_by design
+Design : switch_4port_synth
+Version: V-2023.12-SP3
+Date   : Thu Jan 15 12:49:13 2026
+****************************************
+
+  Startpoint: gen_ports[0].port_inst/rd_ptr_reg[1] (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: grant_reg[0] (rising edge-triggered flip-flop clocked by clk)
+  Mode: FUNC
+  Corner: Slow
+  Scenario: FUNC_Slow
+  Path Group: clk
+  Path Type: max
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (ideal)                      0.00      0.00
+
+  gen_ports[0].port_inst/rd_ptr_reg[1]/CLK (SDFFARX1_HVT)
+                                                   0.00      0.00 r
+  gen_ports[0].port_inst/rd_ptr_reg[1]/Q (SDFFARX1_HVT)
+                                                   0.57      0.57 f
+  gen_ports[0].port_inst/ctmi_1932/Y (NAND2X0_RVT)
+                                                   0.15      0.72 r
+  gen_ports[0].port_inst/phfnr_buf_1394/Y (INVX0_RVT)
+                                                   0.14      0.86 f
+  gen_ports[0].port_inst/ctmi_1941/Y (AND3X4_LVT)
+                                                   0.21      1.07 f
+  gen_ports[0].port_inst/ctmi_1977/Y (AO22X1_RVT)
+                                                   0.18      1.25 f
+  gen_ports[0].port_inst/ctmi_1976/Y (AO221X1_RVT)
+                                                   0.14      1.39 f
+  gen_ports[0].port_inst/ctmi_1975/Y (AO221X1_RVT)
+                                                   0.15      1.54 f
+  gen_ports[0].port_inst/ctmi_1974/Y (AO221X1_RVT)
+                                                   0.16      1.70 f
+  gen_ports[0].port_inst/ctmi_1970/Y (OR3X1_RVT)   0.18      1.88 f
+  gen_ports[0].port_inst/ctmi_1969/Y (OA221X1_RVT)
+                                                   0.33      2.21 f
+  ctmi_318/Y (NAND3X0_RVT)                         0.13      2.34 r
+  ctmi_317/Y (AND3X4_LVT)                          0.17      2.51 r
+  HFSINV_720_1459/Y (INVX2_RVT)                    0.12      2.63 f
+  ctmi_334/Y (AO22X1_RVT)                          0.20      2.82 f
+  ctmi_329/Y (AO221X1_RVT)                         0.13      2.95 f
+  ctmi_328/Y (OA21X1_RVT)                          0.17      3.12 f
+  grant_reg[0]/D (SDFFARX1_HVT)                    0.00      3.12 f
+  data arrival time                                          3.12
+
+  clock clk (rise edge)                           10.00     10.00
+  clock network delay (ideal)                      0.00     10.00
+  grant_reg[0]/CLK (SDFFARX1_HVT)                  0.00     10.00 r
+  clock uncertainty                               -0.15      9.85
+  library setup time                              -0.50      9.35
+  data required time                                         9.35
+  ------------------------------------------------------------------------
+  data required time                                         9.35
+  data arrival time                                         -3.12
+  ------------------------------------------------------------------------
+  slack (MET)                                                6.23
+
+
+1

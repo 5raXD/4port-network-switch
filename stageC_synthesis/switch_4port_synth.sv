@@ -1,4 +1,4 @@
-module switch_4port_synth #(
+module switch_4port_synth #(//hi
   parameter NUM_PORTS = 4,
   parameter FIFO_DEPTH = 16
 )(

@@ -1,0 +1,39 @@
+****************************************
+Report : area
+Design : switch_4port_synth
+Version: V-2023.12-SP3
+Date   : Thu Jan 15 11:52:58 2026
+****************************************
+
+Number of ports:                          475
+Number of nets:                          1895
+Number of cells:                         1525
+Number of combinational cells:            709
+Number of sequential cells:               816
+Number of macros/black boxes:               0
+Number of buf/inv:                        103
+Number of references:                      40
+
+Combinational area:                   1876.35
+Buf/Inv area:                          243.98
+Noncombinational area:                7265.47
+Macro/Black Box area:                    0.00
+
+Total cell area:                      9141.81
+
+Hierarchical area distribution
+------------------------------
+
+                                  Global cell area                  Local cell area
+                                  -------------------------------------------------------------
+Hierarchical cell                 Absolute      Percent  Combi-       Noncombi-    Black-
+                                  Total         Total    national     national     boxes         Design
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+switch_4port_synth                     9141.81    100.0       284.39       718.72          0.00  switch_4port_synth
+gen_ports[0].port_inst                 3641.38     39.8       725.33      2916.05          0.00  switch_port_synth_FIFO_DEPTH16_PORT_ID0
+gen_ports[1].port_inst                 3630.70     39.7       710.59      2920.11          0.00  switch_port_synth_FIFO_DEPTH16_PORT_ID1
+gen_ports[2].port_inst                  433.32      4.7        78.02       355.29          0.00  switch_port_synth_FIFO_DEPTH16_PORT_ID2
+gen_ports[3].port_inst                  433.32      4.7        78.02       355.29          0.00  switch_port_synth_FIFO_DEPTH16_PORT_ID3
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Total                                                        1876.35      7265.47          0.00
+1
